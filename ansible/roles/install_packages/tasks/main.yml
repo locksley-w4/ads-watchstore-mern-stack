@@ -1,0 +1,18 @@
+---
+# tasks file for install_packages
+
+- name: Install packages on Debian-based systems
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "{{ package_state }}"
+    update_cache: true
+  loop: "{{ package_list }}"
+  when: ansible_facts['os-family'] == "Debian"
+
+- name: Install packages on RedHat-based systems
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: "{{ package_state }}"
+    update_cache: true
+  loop: "{{ package_list }}"
+  when: ansible_facts['os-family'] == "RedHat"

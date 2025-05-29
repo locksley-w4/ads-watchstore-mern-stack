@@ -1,0 +1,7 @@
+---
+# defaults file for install_packages
+
+package_list:
+  - docker.io
+
+package_state: present

@@ -11,7 +11,7 @@ resource "google_compute_subnetwork" "app-subnet" {
 
 resource "google_compute_firewall" "app-firewall" {
     name = "app-firewall"
-    network = google_compute_network.app-network.id
+    network = google_compute_network.app-network.name
 
     allow {
         protocol = "tcp"
@@ -44,6 +44,10 @@ resource "google_compute_instance" "app-frontend" {
       access_config {
         nat_ip = google_compute_address.app-website-address.address
       }
+    }
+
+    metadata = {
+      ssh-keys = "ubuntu:${file(var.public_key_path)}"
     }
 }
 

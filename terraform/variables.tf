@@ -9,3 +9,7 @@ variable "region" {
 variable "zone" {
     default = "us-central1-a"
 }
+
+variable "public_key_path" {
+    default = "~./.ssh/id_rsa.pub"
+}
