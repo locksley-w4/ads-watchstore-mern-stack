@@ -26,4 +26,4 @@ deploy_image:
 
   script:
     - pwd
-    - ansible-playbook playbooks/run_container.yml
+    - ansible-playbook ansible/playbooks/run_container.yml
