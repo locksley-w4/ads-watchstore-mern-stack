@@ -20,6 +20,9 @@ build_image:
 
 deploy_image:
   stage: deploy
-  
+  image: python:3.10
+  before_script:
+    - pip install ansible
+
   script:
     - ansible-playbook playbooks/run_container.yml
