@@ -1,11 +1,5 @@
 ---
 # tasks file for run_container
-- name: Pull and run Docker image
-  command: "\
-    docker login -u gitlab-ci-token -p {{ CI_JOB_TOKEN }} registry.gitlab.com
-    docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
-    docker run -d -p 80:80 -n $CONTAINER_NAME $IMAGE_NAME
-    "
 
 - name: Login to container registry
   command: "docker login -u gitlab-ci-token -p {{ CI_JOB_TOKEN }} registry.gitlab.com"
