@@ -23,7 +23,7 @@ deploy_image:
   image: python:3.10
   before_script:
     - pip install ansible
-    - cd /builds/locksley-w4/ads_watchstore/
+    - chmod go-w .
 
 
   script:
