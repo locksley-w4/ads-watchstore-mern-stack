@@ -25,4 +25,5 @@ deploy_image:
     - pip install ansible
 
   script:
+    - pwd
     - ansible-playbook playbooks/run_container.yml
