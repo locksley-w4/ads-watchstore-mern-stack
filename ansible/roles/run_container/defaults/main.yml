@@ -1,0 +1,4 @@
+---
+# defaults file for run_container
+IMAGE_NAME: registry.gitlab.com/locksley-w4/ads_watchstore
+CONTAINER_NAME: webserver

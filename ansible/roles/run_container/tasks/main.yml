@@ -1,0 +1,8 @@
+---
+# tasks file for run_container
+- name: Pull and run Docker image
+  command: "|
+    echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY &&
+    docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
+    docker run -d -p 80:80 -n $CONTAINER_NAME $IMAGE_NAME
+    "
