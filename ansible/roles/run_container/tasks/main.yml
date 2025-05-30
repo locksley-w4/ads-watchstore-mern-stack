@@ -6,6 +6,7 @@
 
 - name: Stop and remove old container
   command: "docker stop {{ CONTAINER_NAME }} && docker rm {{  CONTAINER_NAME  }}"
+  ignore_errors: True
 
 - name: Run container
-  command: "docker run -d -p 80:80 -n {{ CONTAINER_NAME }} {{ IMAGE_NAME }}"
+  command: "docker run -d -p 80:80 --name {{ CONTAINER_NAME }} {{ IMAGE_NAME }}"
