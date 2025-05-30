@@ -14,7 +14,7 @@ const Homepage = () => {
     <div className='homepage'>
         <HomepageHeader setSidebarVisible={setSidebarVisible}/>
         <Sidebar setSidebarVisible={setSidebarVisible} visible={sidebarVisible}/>
-        <h1 className='greeting'>Hello</h1>
+        <h1 className='greeting'>Hello!</h1>
         <h2>Choose Your Top Brands</h2>
         <HomepageCategories/>
         <Offers/>
