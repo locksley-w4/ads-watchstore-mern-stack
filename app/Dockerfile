@@ -20,7 +20,7 @@ RUN chown -R www-data:www-data /var/www/app/html
 
 COPY nginx.conf /etc/nginx/sites-available/app
 
-RUN ln -s /etc/nginx/sites-available/app etc/nginx/sites-enabled/app
+RUN ln -s /etc/nginx/sites-available/app etc/nginx/sites-enabled/
 
 EXPOSE 80
 
