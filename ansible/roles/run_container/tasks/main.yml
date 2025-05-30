@@ -12,5 +12,9 @@
   command: "docker rm {{  CONTAINER_NAME  }}"
   ignore_errors: True
 
+- name: Remove old image
+  command: "docker rmi {{ IMAGE_NAME }}"
+  ignore_errors: True
+
 - name: Run container
   command: "docker run -d -p 80:80 --name {{ CONTAINER_NAME }} {{ IMAGE_NAME }}"
