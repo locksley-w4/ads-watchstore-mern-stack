@@ -29,4 +29,4 @@ deploy_image:
     - chmod 600 ~/.ssh/id_rsa
 
   script:
-    - ansible-playbook -v -e "CI_REGISTRY=$CI_REGISTRY CI_REGISTRY_USER=$CI_REGISTRY_USER CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" ansible/playbooks/run_container.yml
+    - ansible-playbook -v -e "CI_REGISTRY=$CI_REGISTRY CI_JOB_TOKEN=$CI_JOB_TOKEN" ansible/playbooks/run_container.yml
