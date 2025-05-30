@@ -19,6 +19,7 @@ COPY --from=builder /app/build /var/www/app/html/
 RUN chown -R www-data:www-data /var/www/app/html
 
 COPY nginx.conf /etc/nginx/conf.d/app.conf
+RUN ls -l /etc/nginx/conf.d/
 
 #RUN ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/
 
