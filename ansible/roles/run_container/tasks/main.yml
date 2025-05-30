@@ -4,8 +4,12 @@
 - name: Login to container registry
   command: "docker login -u gitlab-ci-token -p {{ CI_JOB_TOKEN }} registry.gitlab.com"
 
-- name: Stop and remove old container
-  command: "docker stop {{ CONTAINER_NAME }} && docker rm {{  CONTAINER_NAME  }}"
+- name: Stop old container
+  command: "docker stop {{  CONTAINER_NAME  }}"
+  ignore_errors: True
+
+- name: Remove old container
+  command: "docker rm {{  CONTAINER_NAME  }}"
   ignore_errors: True
 
 - name: Run container
