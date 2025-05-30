@@ -7,7 +7,7 @@
     state: "{{ package_state }}"
     update_cache: true
   loop: "{{ package_list }}"
-  when: ansible_facts['os-family'] == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Install packages on RedHat-based systems
   ansible.builtin.yum:
@@ -15,4 +15,4 @@
     state: "{{ package_state }}"
     update_cache: true
   loop: "{{ package_list }}"
-  when: ansible_facts['os-family'] == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"

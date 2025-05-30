@@ -2,7 +2,8 @@ web:
   hosts:
     web-uscentral1-a:
       ansible_host: 34.121.30.18
-      ansible_become_user: root
+      ansible_user: ubuntu
       ansible_connection: ssh
-      ansible_ssh_private_key_file: ~./.ssh/id_rsa
+      ansible_ssh_private_key_file: ~/.ssh/id_rsa
       ansible_become_password: $HOST_USER_PASSWORD
+      ansible_python_interpreter: /usr/bin/python3

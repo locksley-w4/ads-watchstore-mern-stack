@@ -11,11 +11,11 @@ resource "google_compute_subnetwork" "app-subnet" {
 
 resource "google_compute_firewall" "app-firewall" {
     name = "app-firewall"
-    network = google_compute_network.app-network.name
+    network = google_compute_network.app-network.id
 
     allow {
         protocol = "tcp"
-        ports = [80, 442, 42]
+        ports = [80, 443, 22]
     }
 
     source_ranges = ["0.0.0.0/0"]
