@@ -16,7 +16,9 @@ build_image:
     - docker build -t $IMAGE_NAME ./app
     - docker push $IMAGE_NAME
 
-  when: manual
+  # when: manual
+  only:
+    - main
 
 deploy_image:
   stage: deploy
@@ -30,3 +32,6 @@ deploy_image:
 
   script:
     - ansible-playbook -v -e "CI_REGISTRY=$CI_REGISTRY CI_JOB_TOKEN=$CI_JOB_TOKEN" ansible/playbooks/run_container.yml
+    
+  only:
+    - main
