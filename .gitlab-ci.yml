@@ -12,7 +12,7 @@ build_image:
     - docker:dind
 
   script:
-    - docker login $CI_REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - docker build -t $IMAGE_NAME ./app
     - docker push $IMAGE_NAME
 
