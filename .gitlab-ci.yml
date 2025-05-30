@@ -12,7 +12,7 @@ build_image:
     - docker:dind
 
   script:
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t $IMAGE_NAME ./app
     - docker push $IMAGE_NAME
 
