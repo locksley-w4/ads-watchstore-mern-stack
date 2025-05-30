@@ -23,7 +23,8 @@ deploy_image:
   image: python:3.10
   before_script:
     - pip install ansible
+    - cd /builds/locksley-w4/ads_watchstore/
+
 
   script:
-    - pwd
-    - ansible-playbook ansible/playbooks/run_container.yml
+    - ansible-playbook -e "CI_REGISTRY=$CI_REGISTRY CI_REGISTRY_USER=$CI_REGISTRY_USER CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD" ansible/playbooks/run_container.yml
