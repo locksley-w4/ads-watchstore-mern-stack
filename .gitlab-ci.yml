@@ -17,3 +17,9 @@ build_image:
     - docker push $IMAGE_NAME
 
   when: manual
+
+deploy_image:
+  stage: deploy
+  
+  script:
+    - ansible-playbook playbooks/run_container.yml
