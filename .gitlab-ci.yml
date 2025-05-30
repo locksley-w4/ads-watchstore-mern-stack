@@ -25,7 +25,7 @@ deploy_image:
     - pip install ansible
     - chmod go-w .
     - mkdir -p ~/.ssh
-    - cp $SSH_PRIVATE_KEY ~/.ssh/id_rsa
+    - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
 
   script:
