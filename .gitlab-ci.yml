@@ -27,6 +27,7 @@ deploy_image:
     - mkdir -p ~/.ssh
     - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
+    - cat ~/.ssh/id_rsa | wc -l
     - ssh-keygen -l -f ~/.ssh/id_rsa || echo "--------------------Invalid private key!"
 
   script:
