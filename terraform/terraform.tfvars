@@ -1,1 +1,0 @@
-public_key_path="C:\Users\user\.ssh"
