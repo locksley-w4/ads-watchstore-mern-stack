@@ -4,6 +4,10 @@ stages:
 
 variables:
   IMAGE_NAME: $CI_REGISTRY/locksley-w4/ads_watchstore
+  IMAGE_TAG: latest
+  CONTAINER_NAME: web
+  DEPLOY_NAMESPACE: default
+  DEPLOY_NAME: web
 
 build_image:
   stage: build
@@ -14,7 +18,11 @@ build_image:
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t $IMAGE_NAME ./app
+    - docker tag $IMAGE_NAME $IMAGE_NAME:CI_COMMIT_SHORT_SHA
     - docker push $IMAGE_NAME
+    - docker push $IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker rmi $IMAGE_NAME
+    - docker rmi $IMAGE_NAME:CI_COMMIT_SHORT_SHA
 
   # when: manual
   only:
@@ -22,16 +30,9 @@ build_image:
 
 deploy_image:
   stage: deploy
-  image: python:3.10
-  before_script:
-    - pip install ansible
-    - chmod go-w .
-    - mkdir -p ~/.ssh
-    - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-
+  image: bitnami/kubectl
   script:
-    - ansible-playbook -v -e "CI_REGISTRY=$CI_REGISTRY CI_JOB_TOKEN=$CI_JOB_TOKEN" ansible/playbooks/run_container.yml
-    
+    - kubectl set image -n $DEPLOY_NAMESPACE deploy/$DEPLOY_NAME $CONTAINER_NAME=$IMAGE_NAME:$IMAGE_TAG
+
   only:
     - main
