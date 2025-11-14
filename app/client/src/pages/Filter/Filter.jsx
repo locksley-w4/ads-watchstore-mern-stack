@@ -8,7 +8,7 @@ import Product from "../../components/Product/Product";
 import { ProductsContext } from "../../context/ProductContextProvider";
 
 const Filter = (props) => {
-  const [query, setQuery] = useState({name: "", categories: []});
+  const [query, setQuery] = useState();
   const [formVisible, setFormVisible] = useState(true);
   const [filteredAndSorted, setFilteredAndSorted] = useState([]);
   const { totalProducts } = useContext(ProductsContext);
