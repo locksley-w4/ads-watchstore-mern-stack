@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRoutes.js";
 import cors from "cors";
+import { logger } from "./middlewares/middlewares.js";
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(logger)
 
 app.use("/uploads", express.static("uploads"));
 

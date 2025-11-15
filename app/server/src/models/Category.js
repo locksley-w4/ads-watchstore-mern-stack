@@ -7,12 +7,12 @@ const categorySchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
-  children_catalogs: {
-    type: Array,
-  },
-  parent_catalogs: {
-    type: Array,
-  },
+  // children_catalogs: {
+  //   type: Array,
+  // },
+  // parent_catalogs: {
+  //   type: Array,
+  // },
 });
 
 export default mongoose.model("Category", categorySchema);

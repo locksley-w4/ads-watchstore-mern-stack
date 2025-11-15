@@ -18,7 +18,7 @@ const Search = () => {
   async function handleSearch(e) {
     e?.preventDefault();
     setErrorMsg("");
-    if (name) filter.nameShort = name;
+    if (name) filter.search = name;
     console.log(filter);
     let [isError, filtered] = await fetchFiltered(
       { ...params, ...filter },

@@ -8,38 +8,41 @@ const FilterForm = ({
   setFormVisible,
   query,
   setQuery,
+  showFiltered,
   ...props
 }) => {
-  const { productKeywords } = useContext(ProductsContext);
+  const { categories } = useContext(ProductsContext);
   const sortOptions = [
-    { name: "By name", value: "byName" },
-    { name: "By Price", value: "byPrice" },
+    { name: "By name", value: "nameShort" },
+    { name: "By Price", value: "price" },
   ];
 
-  const [categories, setCategories] = useState([]);
-  const [sortType, setSortType] = useState(""); // "name" or "price"
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [sortType, setSortType] = useState("nameShort"); // "name" or "price"
 
   useEffect(() => {
-    if(query) {
-      setCategories(query.categories)
-      setSortType(query.sortType)
+    if (query) {
+      setSelectedCategories(query.categories);
+      setSortType(query.sortType);
     }
-  }, [query])
-  
+  }, [query]);
 
   function showFilteredAndSorted(e) {
     e.preventDefault();
-    setQuery({categories, sortType})
+    const newQuery = { categories: selectedCategories, sortBy: sortType };
+    setQuery(newQuery);
+    showFiltered(newQuery);
     setFormVisible(false);
   }
+
   return (
     <div className={`filterForm ${formVisible ? "active" : ""}`} {...props}>
       <form id="filterForm">
         <h2>Select Categories</h2>
         <CheckboxContainer
-          options={productKeywords}
-          checkedValues={categories}
-          setCheckedValues={setCategories}
+          options={categories}
+          checkedValues={selectedCategories}
+          setCheckedValues={setSelectedCategories}
         />
         <h2>Sort by</h2>
         <RadioCheckboxContainer

@@ -45,7 +45,7 @@ const CategoryProducts = React.memo(({ ...props }) => {
         {productsLoading ? (
           <p>Loading..</p>
         ) : (
-          filteredProducts.length &&
+          filteredProducts?.length &&
           filteredProducts.map((product, index) => (
             <li className="product" key={index}>
               <Product product={product} />

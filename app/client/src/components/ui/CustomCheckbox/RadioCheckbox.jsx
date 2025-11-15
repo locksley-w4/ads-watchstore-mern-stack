@@ -7,19 +7,19 @@ const RadioCheckbox = function ({
   setCheckedValue,
   ...props
 }) {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(null);
   function toggleChecked() {
     handleChange(!checked); // function uses (!value), because new inversed value will be applied only after a re-render
   }
   function handleChange(checked) {
-      if (!setCheckedValue) return;
-      setCheckedValue(checked ? value : null)
-    }
-    
-    useEffect(() => {
-        setChecked(currentCheckedValue === value)
-  }, [currentCheckedValue])
-  
+    if (!setCheckedValue) return;
+    setCheckedValue(checked ? value : null);
+  }
+
+  useEffect(() => {
+    setChecked(currentCheckedValue === value);
+
+  }, [currentCheckedValue]);
 
   return (
     <div

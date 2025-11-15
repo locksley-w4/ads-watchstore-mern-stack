@@ -3,6 +3,7 @@ import {
   handleCreateCategory,
   handleCreateProduct,
   handleEditProduct,
+  handleGetCategories,
   handleGetProducts,
 } from "../controllers/categoryProductController.js";
 import { getOfferBannerList } from "../utils/utils.js";
@@ -11,6 +12,8 @@ import { handleCreateBrands, handleGetBanners, handleGetBrands } from "../contro
 const userRouter = express.Router();
 
 userRouter.post("/category", handleCreateCategory);
+
+userRouter.get("/categories", handleGetCategories);
 
 userRouter.get("/products", handleGetProducts);
 

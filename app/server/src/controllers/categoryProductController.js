@@ -63,13 +63,80 @@ export async function handleEditProduct(req, res) {
 export async function handleGetProducts(req, res) {
   try {
     // console.log(req.query);
-    const filter = req.query;
-    if (filter.nameShort)
-      filter.nameShort = { $regex: new RegExp(`.*${filter.nameShort}.*`, "i") };
-    console.log(filter);
+    const {
+      search,
+      categories,
+      brand,
+      sortBy = "nameShort",
+      sortOrder = "asc",
+    } = req.query;
 
-    const filtered = await Product.find(filter ?? {});
-    res.status(200).json(filtered);
+    const rawCategories = categories ?? req.query["categories[]"];
+    const pipeline = [];
+
+    if (search) {
+      pipeline.push({
+        $search: {
+          index: "productShortName",
+          text: {
+            query: search,
+            path: ["nameShort", "description"],
+            fuzzy: {
+              maxEdits: 2,
+              prefixLength: 0,
+              maxExpansions: 50,
+            },
+          },
+        },
+      });
+    }
+
+    const match = {};
+
+    if (brand) {
+      match.brand = brand;
+    }
+
+    if (rawCategories) {
+      console.log(rawCategories);
+      
+      const categoryList = Array.isArray(rawCategories)
+        ? rawCategories
+        : [rawCategories];
+      match.categories = { $in: categoryList };
+    }
+
+    if (Object.keys(match).length > 0) {
+      pipeline.push({
+        $match: match,
+      });
+    }
+
+    pipeline.push({
+      $sort: {
+        [sortBy]: sortOrder === "des" ? -1 : 1,
+      },
+    });
+
+    pipeline.push({ $limit: 20 });
+
+    // filter.nameShort = { $regex: new RegExp(`.*${filter.nameShort}.*`, "i") };
+
+    const result = await Product.aggregate(pipeline);
+    // const filtered = await Product.find(filter ?? {});
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function handleGetCategories(req, res) {
+  try {
+    const filter = {};
+    if (req.body?.name) filter.name = req.body.name;
+    const result = await Category.find(filter);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);

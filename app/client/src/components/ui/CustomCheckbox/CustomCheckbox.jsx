@@ -19,6 +19,7 @@ const CustomCheckbox = function ({
   }
 
   useEffect(() => {
+    console.log(checkedValues);
     setChecked(checkedValues.includes(value))
   }, [checkedValues])
   
