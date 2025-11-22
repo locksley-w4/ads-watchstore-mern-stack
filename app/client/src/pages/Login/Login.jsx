@@ -6,6 +6,7 @@ import googleLogo from "../../components/assets/google-logo.webp";
 import MyInput from "../../components/ui/MyInput/MyInput";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContextProvider";
+import { HashLoader } from "react-spinners";
 const Login = () => {
   const navigate = useNavigate();
   const [login, setLogin] = useState("");
@@ -33,7 +34,7 @@ const Login = () => {
   }, [isAuth]);
 
   if (isAuthLoading) {
-    return "Loading..";
+    return <HashLoader style={{marginTop: "30vh"}}/>;
   }
 
   return (

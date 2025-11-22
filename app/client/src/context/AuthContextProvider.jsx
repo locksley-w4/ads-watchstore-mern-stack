@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useId, useState } from "react";
 import CryptoJS from "crypto-js";
+import { api } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 // localStorage.setItem("userCredentials", JSON.stringify({}));
 // localStorage.setItem("usersData", JSON.stringify({}));
@@ -11,91 +13,110 @@ const AuthContextProvider = ({ children }) => {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isAuthError, setIsAuthError] = useState(null);
   const [authErrorMsg, setAuthErrorMsg] = useState(null);
-  const [id, setId] = useState(null);
+  const [user, setUser] = useState({});
+  // const [id, setId] = useState(null);
 
   function clearAuthError() {
     setIsAuthError(false);
     setAuthErrorMsg("");
   }
 
-  useEffect(() => {
-    setIsAuth(localStorage.getItem("isAuth") === "true");
-    const _id = localStorage.getItem("userId");
-    setId(_id !== "undefined" ? _id : null);
+  useEffect(() => {    
+    setIsAuth(!!sessionStorage.getItem("accessToken"));
+    // const _id = localStorage.getItem("userId");
+    // setId(_id !== "undefined" ? _id : null);
   }, []);
 
   async function logout() {
-    setIsAuth(false);
-    localStorage.setItem("isAuth", "false");
+    try {
+      const response = await api.post("/auth/logout");
+      setIsAuth(false);
+      sessionStorage.removeItem("accessToken");      
+      sessionStorage.removeItem("user");
+      // await api.post("/auth/logout");
+    } catch (error) {
+      console.error(error);
+    }
   }
-  async function login(credit) {
+
+  async function login(creds) {
     // input: {login, password}
     setIsAuthLoading(true);
     try {
-      if (!credit.login || !credit.password)
+      if (!creds.login || !creds.password)
         throw new Error("Enter your login and password.");
-      const userCredentials = JSON.parse(
-        localStorage.getItem("userCredentials")
-      );
-      if(!userCredentials) {
-        localStorage.setItem("userCredentials", "{}");
-      }
-      const userData = userCredentials?.[credit.login];
-      if (!userData)
-        throw new Error("User is not found.");
 
-      if (String(userData.password) === String(credit.password)) {
+      const {
+        data: { accessToken, user },
+        status,
+      } = await api.post("/auth/login", creds);
+
+      setIsAuthLoading(false);
+
+      if (accessToken && status.toString().startsWith("2")) {
         setIsAuth(true);
-        setIsAuthLoading(false);
         setIsAuthError(false);
         setAuthErrorMsg(null);
-        localStorage.setItem("isAuth", "true");
-        localStorage.setItem("userId", userData.userId);
-        setId(userData.userId);
-      } else if (userData) throw new Error("Incorrect password.");
-      else throw new Error("Authentication error. Please, try again.");
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+      }
+
+      // if (String(userData.password) === String(creds.password)) {
+      //   setIsAuth(true);
+      //   setIsAuthLoading(false);
+      //   setIsAuthError(false);
+      //   setAuthErrorMsg(null);
+      //   localStorage.setItem("isAuth", "true");
+      //   localStorage.setItem("userId", userData.userId);
+      //   setId(userData.userId);
+      // } else if (userData) throw new Error("Incorrect password.");
+      // else throw new Error("Authentication error. Please, try again.");
     } catch (er) {
+      console.error(er);
       setIsAuthLoading(false);
       setIsAuthError(true);
-      setAuthErrorMsg(er.message);
+      if (er.response?.status === 401 ?? 500)
+        setAuthErrorMsg("Wrong credentials");
+      else setAuthErrorMsg(er.response?.data?.message ?? "Server error");
     }
   }
   async function register({ email, password, fullName, phoneNumber }) {
     // input: {login, password}
     setIsAuthLoading(true);
     try {
-      if (!email || !password) throw new Error("Enter new login and password.");
+      if ((!email || !password || !email, !fullName, !phoneNumber))
+        throw new Error("Enter new login and password.");
 
-      const userCredentials = JSON.parse(
-        localStorage.getItem("userCredentials") || "{}"
-      );
-      if (!userCredentials[email]) {
-        // const crypto = require('crypto');
-        const userId = CryptoJS.SHA256(email).toString();
-        userCredentials[email] = { password, userId };
-        localStorage.setItem(
-          "userCredentials",
-          JSON.stringify(userCredentials)
-        );
+      const {
+        data: { accessToken, user },
+        status,
+      } = await api.post("/auth/register", {
+        email,
+        password,
+        fullName,
+        phoneNumber,
+      });
+
+      setIsAuthLoading(false);
+
+      if (accessToken && status.toString().startsWith("2")) {
         setIsAuth(true);
-        setIsAuthLoading(false);
         setIsAuthError(false);
         setAuthErrorMsg(null);
-        localStorage.setItem("isAuth", "true");
-        localStorage.setItem("userId", userId);
-        const userData = { userId, email, password, fullName, phoneNumber, cart: [] };
-        const users = JSON.parse(localStorage.getItem("usersData") || "{}");
-        users[userId] = userData;
-        setId(userId);
-        localStorage.setItem("usersData", JSON.stringify(users));
-      } else
-        throw new Error(
-          "User already exists. Please login or choose different login."
-        );
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+      }
+      // throw new Error(
+      //   "User already exists. Please login or choose different login."
+      // );
     } catch (er) {
+      console.error(er);
       setIsAuthLoading(false);
       setIsAuthError(true);
-      setAuthErrorMsg(er.message);
+      if (er.response?.status === 401) setAuthErrorMsg("Wrong credentials");
+      else setAuthErrorMsg(er.response?.data?.message ?? "Server error");
     }
   }
 
@@ -106,7 +127,9 @@ const AuthContextProvider = ({ children }) => {
         isAuthLoading,
         isAuthError,
         authErrorMsg,
-        userId: id,
+        user,
+        setUser,
+        // userId: id,
         login,
         logout,
         register,

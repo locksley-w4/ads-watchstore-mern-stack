@@ -83,13 +83,13 @@ export async function handleGetProducts(req, res) {
             path: ["nameShort", "description"],
             fuzzy: {
               maxEdits: 2,
-              prefixLength: 0,
-              maxExpansions: 50,
+              prefixLength: 0
             },
           },
         },
       });
     }
+    
 
     const match = {};
 
@@ -98,8 +98,6 @@ export async function handleGetProducts(req, res) {
     }
 
     if (rawCategories) {
-      console.log(rawCategories);
-      
       const categoryList = Array.isArray(rawCategories)
         ? rawCategories
         : [rawCategories];
@@ -124,6 +122,20 @@ export async function handleGetProducts(req, res) {
 
     const result = await Product.aggregate(pipeline);
     // const filtered = await Product.find(filter ?? {});
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function handleGetProductById(req, res) {
+  try {
+    const { id } = req.params;
+    console.log(req.params);
+    
+    if (!id) return res.status(409).json({message: "No id was provided in URL params."});
+    const result = await Product.findById(id);
     res.status(200).json(result);
   } catch (err) {
     console.error(err);

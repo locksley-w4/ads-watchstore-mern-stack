@@ -5,6 +5,7 @@ import { compareObjects, fetchFiltered, getProductsByCategory } from "../../../u
 import Product from "../../../components/Product/Product";
 import SliderList from "../../../components/ui/SliderList/SliderList";
 import { ProductsContext } from "../../../context/ProductContextProvider";
+import { HashLoader } from "react-spinners";
 
 const CategoryProducts = React.memo(({ ...props }) => {
   const [productCategory, setCategory] = useState(null);
@@ -43,7 +44,7 @@ const CategoryProducts = React.memo(({ ...props }) => {
       <SliderList className="productsContainer">
         {errorMsg ? <p>{errorMsg}</p> : ""}
         {productsLoading ? (
-          <p>Loading..</p>
+          <HashLoader className="loader" color="#d1a851" />
         ) : (
           filteredProducts?.length &&
           filteredProducts.map((product, index) => (

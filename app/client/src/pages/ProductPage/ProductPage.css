@@ -141,3 +141,7 @@
 .product-page .description.active button.showDescription {
   transform: rotate(180deg) translateY(-15px);
 }
+
+.similar-products {
+  margin: 0 auto;
+}

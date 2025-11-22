@@ -1,11 +1,13 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRoutes.js";
 import cors from "cors";
 import { logger } from "./middlewares/middlewares.js";
-
-dotenv.config();
+import { sessionConfig } from "./configs/sessionConfig.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
@@ -15,6 +17,8 @@ mongoose
   .then(() => console.log("Successfully connected to db"))
   .catch((err) => console.error(err));
 
+app.use(express.json());
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -22,13 +26,11 @@ app.use(
   })
 );
 
-app.use(express.json());
-
-app.use(logger)
+app.use(cookieParser());
+app.use(logger); // logs request number
+app.use(sessionConfig);
 
 app.use("/uploads", express.static("uploads"));
-
-// app.use("/uploads/offer-banners", express.static("uploads/offer-banners"));
 
 app.use("/api/v1", userRouter);
 

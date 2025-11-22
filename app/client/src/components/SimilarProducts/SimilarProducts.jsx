@@ -6,14 +6,15 @@ import { useSimilarProducts } from "../../utils/utils";
 import Product from "../Product/Product";
 
 const SimilarProducts = ({ keywords, productId, ...props }) => {
-  const similar = useSimilarProducts(productId, keywords);
+  const [isError, similar] = useSimilarProducts(keywords);
 
   if (!similar) {
-    return <div>No similar products!</div>
+    return <div>No similar products! {isError && <p>Error occured</p>}</div>;
   }
+
   return (
     <div className="similar-products" {...props}>
-      <SectionHeader seeAllLink="./">Similar Products</SectionHeader>
+      <SectionHeader replace={true} seeAllLink="/">Similar Products</SectionHeader>
       <ProductsContainer>
         {similar.length &&
           similar.map((product, index) => (

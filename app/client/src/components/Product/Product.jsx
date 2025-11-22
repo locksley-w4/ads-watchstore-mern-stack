@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Product.css";
 import { useNavigate } from "react-router-dom";
 // import path from "path";
 import { baseURL } from "../../api/api";
 import { normalizeImageURL } from "../../utils/utils";
+import { ProductsContext } from "../../context/ProductContextProvider";
 
 const Product = ({ product, ...props }) => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Product = ({ product, ...props }) => {
   }, [product]);
 
   function referToProductPage() {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product._id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   if (!product) {

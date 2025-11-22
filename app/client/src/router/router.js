@@ -59,6 +59,7 @@ export const privateRoutes = [
   {
     path: "/login",
     element: <Login />,
+    
   },
   {
     path: "/signup",
@@ -141,7 +142,7 @@ export const publicRoutes = [
 const AppRouterProvider = () => {
   const { isAuth } = useContext(AuthContext);
   const router = createBrowserRouter(isAuth ? privateRoutes : publicRoutes);
-
+  
   return <RouterProvider router={router} />;
 };
 

@@ -7,14 +7,13 @@ import { ProductsContext } from "../../context/ProductContextProvider";
 
 const Orders = () => {
   const { productPrices = {} } = useContext(ProductsContext);
-
-  const { cart, clearCart } = useContext(UserContext);
+  const { clearCart } = useContext(UserContext);
   const [discount, setDiscount] = useState(0.25);
   const [totalPrice, setTotalPrice] = useState(0);
-  useEffect(() => {
-    if (cart?.orders && cart?.orders)
-      setTotalPrice(cart.calculateTotal(cart.orders, productPrices));
-  }, [cart.orders, productPrices]);
+  // useEffect(() => {
+  //   if (cart?.orders && cart?.orders)
+  //     setTotalPrice(cart.calculateTotal(cart.orders, productPrices));
+  // }, [cart.orders, productPrices]);
 
   return (
     <div className="orders-page">

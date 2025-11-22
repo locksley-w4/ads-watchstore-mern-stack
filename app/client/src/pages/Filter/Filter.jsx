@@ -10,6 +10,7 @@ import {
 } from "../../utils/utils";
 import Product from "../../components/Product/Product";
 import { ProductsContext } from "../../context/ProductContextProvider";
+import { HashLoader } from "react-spinners";
 
 const Filter = (props) => {
   const [query, setQuery] = useState({});
@@ -68,7 +69,7 @@ const Filter = (props) => {
       <ProductsContainer className={formVisible ? "collapsed" : ""}>
         {errorMsg ? <p>{errorMsg}</p> : ""}
         {isLoading ? (
-          <p>Loading..</p>
+          <HashLoader style={{marginTop: "30vh"}}/>
         ) : filtered.length ? (
           filtered.map((elem, i) => <Product product={elem} key={i} />)
         ) : (

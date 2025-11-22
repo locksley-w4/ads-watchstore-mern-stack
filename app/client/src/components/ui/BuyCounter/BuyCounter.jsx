@@ -1,46 +1,75 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./BuyCounter.css";
 import { UserContext } from "../../../context/UserContextProvider";
-const BuyCounter = ({ vertical, productId, stopPropagation = false,...props }) => {
-  const [buyCount, setBuyCount] = useState(0);
-  const {
-    cart,
-    setCart,
-  } = useContext(UserContext);
+import { getObjCopy } from "../../../utils/utils";
+import { AuthContext } from "../../../context/AuthContextProvider";
+const BuyCounter = ({
+  vertical,
+  productId,
+  stopPropagation = false,
+  ...props
+}) => {
+  const buyCount = useRef(0);
+  const { isAuth } = useContext(AuthContext);
+  // const [buyCount, setBuyCount] = useState(0);
+  const { cart, handleCartUpdate, setCart } = useContext(UserContext);
 
   useEffect(() => {
-    const productCounter = cart?.orders?.[productId] || 0;
-    setBuyCount(productCounter);
-  }, [cart?.orders?.[productId]]);
+    if (!cart) return;
+    const productCounter = cart[productId] || 0;
+    buyCount.current = productCounter;
+    // setBuyCount(productCounter);
+  }, [cart]);
 
-  function decrementCounter() {
-    if (buyCount <= 0) {
+  async function decrementCounter() {
+    if (!isAuth) {
+      alert("Login to add to your cart");
       return;
     }
-    setCart((prev) => {
-      let currentVal = prev?.orders[productId];
-      const newVal = currentVal > 0 ? currentVal - 1 : 0;
-      const newOrders = {...prev.orders, [productId]: newVal};
-      return {...prev, orders: newOrders};
-    });
+    const currentVal = cart[productId];
+    if (!currentVal) return;
+    const _prev = getObjCopy(cart);
+    buyCount.current--;
+    const newVal = currentVal - 1;
+    const newCart = { ...cart, [productId]: newVal };
+    setCart(newCart);
+    await handleCartUpdate(productId, _prev, newCart);
   }
-  function incrementCounter() {
-    // if (setBuyCount) setBuyCount((prev) => prev + 1);
-    // console.log(cart);
-    setCart((prev) => {
-      let currentVal = prev?.orders[productId];
-      const newVal = currentVal ? currentVal + 1 : 1;
-      const newOrders = {...prev.orders, [productId]: newVal};
-      return {...prev, orders: newOrders};
-    });
+  async function incrementCounter() {
+    if (!isAuth) {
+      alert("Login to add to your cart");
+      return;
+    }
+    buyCount.current++;
+    const _prev = getObjCopy(cart);
+    const currentVal = cart[productId];
+    const newVal = currentVal ? currentVal + 1 : 1;
+    const newCart = { ...cart, [productId]: newVal };
+    setCart(newCart);
+    await handleCartUpdate(productId, _prev, newCart);
   }
   return (
-    <div className={`buyCounter ${vertical ? "vertical" : ""}`} onClick={stopPropagation ? e => e.stopPropagation() : null}>
-      <button onClick={decrementCounter} className="substract">
+    <div
+      className={`buyCounter ${vertical ? "vertical" : ""}`}
+      onClick={stopPropagation ? (e) => e.stopPropagation() : null}
+    >
+      <button
+        onClick={decrementCounter}
+        // onClick={() => {
+        //   decrementProduct(productId);
+        // }}
+        className="substract"
+      >
         -
       </button>
-      <span className="counterValue">{buyCount}</span>
-      <button onClick={incrementCounter} className="add">
+      <span className="counterValue">{buyCount.current}</span>
+      <button
+        onClick={incrementCounter}
+        // onClick={() => {
+        //   incrementProduct(productId);
+        // }}
+        className="add"
+      >
         +
       </button>
     </div>

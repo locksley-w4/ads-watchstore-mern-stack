@@ -19,7 +19,6 @@ const Search = () => {
     e?.preventDefault();
     setErrorMsg("");
     if (name) filter.search = name;
-    console.log(filter);
     let [isError, filtered] = await fetchFiltered(
       { ...params, ...filter },
       setProductsLoading
@@ -34,9 +33,7 @@ const Search = () => {
   useEffect(() => {
     for (const el of params.entries()) {
       if(el[0] === "name") continue;
-      filter[el[0]] = el[1];
-      console.log(el);
-      
+      filter[el[0]] = el[1];      
     }
     if (params) handleSearch();
   }, [params]);

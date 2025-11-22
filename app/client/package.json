@@ -9,12 +9,14 @@
     "cra-template": "1.2.0",
     "crypto": "^1.0.1",
     "crypto-js": "^4.2.0",
+    "debounce": "^3.0.0",
     "path": "^0.12.7",
     "process": "^0.11.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "react-spinners": "^0.17.0"
   },
   "scripts": {
     "start": "react-scripts start",

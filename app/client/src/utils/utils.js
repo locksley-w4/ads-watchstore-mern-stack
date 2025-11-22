@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { api, baseURL } from "../api/api";
-import { ProductsContext } from "../context/ProductContextProvider";
 
 export async function fetchFiltered(filter, setLoading) {
   try {
@@ -8,6 +7,20 @@ export async function fetchFiltered(filter, setLoading) {
     const { data } = await api.get("/products", {
       params: filter,
     });
+
+    if (setLoading) setLoading(false);
+    return [false, data];
+  } catch (error) {
+    if (setLoading) setLoading(false);
+    console.error(error);
+    return [true, null];
+  }
+}
+
+export async function fetchProductByID(id, setLoading) {
+  try {
+    if (setLoading) setLoading(true);
+    const { data } = await api.get(`/product/${id}`);
     if (setLoading) setLoading(false);
     return [false, data];
   } catch (error) {
@@ -53,26 +66,43 @@ export async function fetchFiltered(filter, setLoading) {
 //   return products;
 // }
 
-export function useSimilarProducts(id, keywords = []) {
+// export function useSimilarProducts(id, keywords = []) {
+//   // finds similar products, using product keywords
+//   const [similar, setSimilar] = useState(null);
+//   const { totalProducts } = useContext(ProductsContext);
+//   useEffect(() => {
+//     const matchList = totalProducts.map((product) => {
+//       let matches = 0;
+//       product.keywords.forEach((keyword) => {
+//         if (keywords.includes(keyword)) matches++;
+//       });
+//       return { product, matches };
+//     });
+//     let filtered = matchList.filter(
+//       (elem) => elem.matches > 0 && elem.product.id !== id
+//     );
+//     filtered.sort((a, b) => b.matches - a.matches);
+//     Array.prototype.pop();
+//     // setSimilar(filtered.map((el) => el.product));
+//   }, [totalProducts, keywords]);
+//   return similar;
+// }
+export function useSimilarProducts(keywords = []) {
   // finds similar products, using product keywords
   const [similar, setSimilar] = useState(null);
-  const { totalProducts } = useContext(ProductsContext);
+  const [isError, setIsError] = useState(false);
+
+  async function fetchSimilar() {
+    setIsError(false);
+    const [_isError, products] = await fetchFiltered({ categories: keywords });
+    if (_isError) setIsError(true);
+    if (products?.length > 0) setSimilar(products);
+  }
+
   useEffect(() => {
-    const matchList = totalProducts.map((product) => {
-      let matches = 0;
-      product.keywords.forEach((keyword) => {
-        if (keywords.includes(keyword)) matches++;
-      });
-      return { product, matches };
-    });
-    let filtered = matchList.filter(
-      (elem) => elem.matches > 0 && elem.product.id !== id
-    );
-    filtered.sort((a, b) => b.matches - a.matches);
-    Array.prototype.pop();
-    setSimilar(filtered.map((el) => el.product));
-  }, [totalProducts, keywords]);
-  return similar;
+    fetchSimilar();
+  }, [keywords]);
+  return [isError, similar];
 }
 
 export function binarySearch(elem, arr) {
@@ -108,6 +138,7 @@ export function searchByName(name, products) {
 }
 
 export function compareObjects(a, b) {
+  if (!a || !b) return false;
   if (Object.keys(a).length !== Object.keys(b).length) return false;
 
   for (const key in a) {
@@ -119,4 +150,42 @@ export function compareObjects(a, b) {
 
 export function normalizeImageURL(url, needPrefix = false) {
   return `${baseURL}${url}`;
+}
+
+export function getObjCopy(a) {
+  // only shallow copy
+  const result = {};
+  for (const key in a) {
+    if (!Object.hasOwn(a, key)) continue;
+    result[key] = a[key];
+  }
+  return result;
+}
+
+export function debounceAsync(clb, timeout) {
+  let timerID = null;
+  let latestResolve = null;
+
+  return (...args) => {
+    clearTimeout(timerID);
+    
+    // Reject previous promise if it exists
+    if (latestResolve) {
+      latestResolve(undefined);
+    }
+    
+    return new Promise((resolve) => {
+      latestResolve = resolve;
+      timerID = setTimeout(async () => {
+        const value = await clb(...args);
+        resolve(value);
+        console.log(123);
+        latestResolve = null;
+      }, timeout);
+    });
+  };
+}
+
+export function isObjEmpty (obj) {
+  return Object.keys({}).length <= 0
 }

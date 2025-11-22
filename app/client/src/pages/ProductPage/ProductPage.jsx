@@ -1,17 +1,42 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-// import { useProduct } from "../../utils/utils";
+import { fetchProductByID, useProduct } from "../../utils/utils";
 import "./ProductPage.css";
-import SimilarProducts from "../../components/SimilarProducts/SimilarProducts";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import BuyCounter from "../../components/ui/BuyCounter/BuyCounter";
+import { ProductsContext } from "../../context/ProductContextProvider";
+import { normalizeImageURL } from "../../utils/utils";
+import SimilarProducts from "../../components/SimilarProducts/SimilarProducts";
+import { HashLoader } from "react-spinners";
 // import { UserContext } from "../../context/UserContextProvider";
 
 const ProductPage = () => {
-  const { productId} = useParams();
-  const product = null;
-  // const product = useProduct(productId);
+  const { productId } = useParams();
+  const [product, setProduct] = useState({});
+  const [errorMsg, setErrorMsg] = useState("");
+  const [productLoading, setProductLoading] = useState(false);
+
   const descriptionRef = useRef(null);
+
+  async function fetchProduct(ignore) {
+    if (ignore) return;
+    setErrorMsg("");
+    ignore = true;    
+    let [isError, result] = await fetchProductByID(
+      productId,
+      setProductLoading
+    );
+    if (isError) {
+      setErrorMsg("Unable to load products. Try again later");
+    }
+    ignore = false;
+    setProduct(result);
+  }
+
+  useEffect(() => {
+    let ignore = false;
+    fetchProduct(ignore);
+  }, [productId]);
 
   useEffect(() => {
     if (descriptionRef.current?.clientHeight <= 350) {
@@ -27,22 +52,29 @@ const ProductPage = () => {
     }
   }
   if (!product) {
-    return <div>Loading..</div>;
+    return <div>No product to show..</div>;
+  }
+  if (productLoading) {
+    return <HashLoader  color="#d1a851" style={{marginTop: "30vh"}}/>;
   }
 
   return (
     <div className="product-page">
       <PageHeader>
-        <h2>{product?.shortName}</h2>
+        <h2>{product?.nameShort}</h2>
         <button>
           <i className="fa fa-bag-shopping"></i>
         </button>
       </PageHeader>
       <div className="product-image">
-        <img src={product?.imageUrl} alt={`${product?.name} - image`} />
+        <img
+          src={normalizeImageURL(product?.imageUrl ?? "#")}
+          alt={`${product?.name} - image`}
+        />
       </div>
       <div className="main-info">
-        <h2 className="name">{product?.name}</h2>
+        {errorMsg ? <p>{errorMsg}</p> : ""}
+        <h2 className="name">{product?.nameFull}</h2>
         <h3 className="price">$ {product?.price}</h3>
       </div>
       <BuyCounter productId={productId} />
@@ -51,11 +83,11 @@ const ProductPage = () => {
         <tbody>
           <tr>
             <td>Case Diameter</td>
-            <td>{product.caseDiameter}</td>
+            <td>{product.caseInfo}</td>
           </tr>
           <tr>
             <td>Water Resistance</td>
-            <td>{product.waterResistance}</td>
+            <td>{product.waterResistanceInfo}</td>
           </tr>
           <tr>
             <td>Strap color</td>
@@ -74,7 +106,7 @@ const ProductPage = () => {
         </button>
       </div>
 
-      <SimilarProducts keywords={product?.keywords} productId={product?.id} />
+      <SimilarProducts keywords={product?.categories} productId={product?.id} />
     </div>
   );
 };

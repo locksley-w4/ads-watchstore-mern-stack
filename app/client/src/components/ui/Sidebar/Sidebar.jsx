@@ -6,7 +6,7 @@ import anime from "animejs";
 import { AuthContext } from "../../../context/AuthContextProvider";
 
 const Sidebar = ({ setSidebarVisible, visible }) => {
-  const { logout } = useContext(AuthContext);
+  const { logout, isAuth } = useContext(AuthContext);
   const sidebarRef = useRef(null);
   let animationDuration = 200;
   function hideSidebar(e) {
@@ -53,7 +53,11 @@ const Sidebar = ({ setSidebarVisible, visible }) => {
         </div>
         <ul>
           <li>
-            <Link onClick={hideSidebar} to="/profile" className={classes.sidebarLink}>
+            <Link
+              onClick={hideSidebar}
+              to="/profile"
+              className={classes.sidebarLink}
+            >
               <i className={classes.icon + " fa fa-user"} />
               Profile
             </Link>
@@ -89,17 +93,30 @@ const Sidebar = ({ setSidebarVisible, visible }) => {
             </Link>
           </li>
           <li>
-            <Link
-              onClick={(e) => {
-                logout();
-                hideSidebar();
-              }}
-              to="/login"
-              className={classes.sidebarLink}
-            >
-              <i className={classes.icon + " fa fa-circle-left"} />
-              Logout
-            </Link>
+            {isAuth ? (
+              <Link
+                onClick={(e) => {
+                  logout();
+                  hideSidebar();
+                }}
+                to="/login"
+                className={classes.sidebarLink}
+              >
+                <i className={classes.icon + " fa fa-circle-left"} />
+                Logout
+              </Link>
+            ) : (
+              <Link
+                onClick={(e) => {
+                  hideSidebar();
+                }}
+                to="/login"
+                className={classes.sidebarLink}
+              >
+                <i className={classes.icon + " fa fa-circle-right"} />
+                Login
+              </Link>
+            )}
           </li>
         </ul>
         <hr />

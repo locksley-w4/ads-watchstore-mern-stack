@@ -13,7 +13,7 @@ const AuthAccess = ({ children }) => {
       <div className="auth-error-page__box">
         <p>
           You need to be logged in to access this page. Please{" "}
-          <Link to="login">Log in</Link> or <Link to="signup">Sign up</Link>
+          <Link to="/login" replace={true}>Log in</Link> or <Link to="/signup" replace={true}>Sign up</Link>
         </p>
       </div>
     </div>

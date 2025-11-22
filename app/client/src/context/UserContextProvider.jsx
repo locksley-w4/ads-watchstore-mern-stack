@@ -3,115 +3,111 @@ import React, {
   useContext,
   useEffect,
   useId,
+  useMemo,
   useState,
 } from "react";
 import { AuthContext } from "./AuthContextProvider";
-import { compareObjects } from "../utils/utils";
+import { compareObjects, debounceAsync, isObjEmpty } from "../utils/utils";
+import { api } from "../api/api";
+import debounce from "debounce";
 
 export const UserContext = createContext();
 
-class Cart {
-  constructor(ordersObj = {}) {
-    this._orders = ordersObj;
-    this.calculateTotal = this.calculateTotal.bind(this);
-  }
-  get orders() {
-    return { ...this._orders };
-  }
-  set orders(val) {
-    this._orders = { ...val } || {};
-  }
-  calculateTotal(ordersObj, productPrices = {}, discount = 0) {    
-    let total = 0;
-    
-    for (const id of Object.keys(ordersObj)) {      
-      total += productPrices[id] * ordersObj[id];
-    }
-    return total * (1 - discount);
-  }
-}
 const UserContextProvider = ({ children }) => {
-  const { isAuth, userId } = useContext(AuthContext);
-  const [userData, setUserData] = useState({});
-  const [cart, setCart] = useState({});
+  const { isAuth, user, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [userDataError, setUserDataError] = useState(null);
+  const [isCartLoading, setIsCartLoading] = useState(false);
+  const [cart, setCart] = useState(null);
+
+  async function fetchUserData(ignore, setLoading, setError) {
+    if (ignore) return;
+    try {
+      setLoading(true);
+      const { data } = await api.get("/user");
+      ignore = false;
+      setLoading(false);
+      if (data.user) {
+        setUser(data.user);
+        sessionStorage.setItem("user", JSON.stringify(data.user));
+        sessionStorage.setItem("cart", JSON.stringify(data.user.cart));
+      }
+    } catch (error) {
+      console.error(error);
+      ignore = false;
+      setLoading(false);
+      if (setError) {
+        setError({
+          message:
+            error?.response?.data?.message || "Error while retriving user data",
+        });
+      }
+    }
+  }
 
   useEffect(() => {
-    if (!isAuth || !userId) {
-      setUserData({});
-      setCart(new Cart());
+    if (!isAuth) {
       return;
     }
 
-    (async () => {
-      setIsLoading(true);
-      setUserDataError(null);
-      try {
-        const data = await getUserData(userId);        
-        setUserData(data);
-        setCart(new Cart(data?.cart || {}));
-        setIsLoading(false);
-      } catch (error) {
-        setUserDataError(error);
-        setIsLoading(false);
-      }
-    })();
-  }, [isAuth, userId]);
+    let ignore = false;
+    try {
+      const userData = JSON.parse(sessionStorage.getItem("user"));
+      const cartData = JSON.parse(sessionStorage.getItem("cart"));
+      if (Object.keys(userData).length <= 0) throw new Error();
+      console.log(userData, cartData);
+
+      setUser(userData);
+      setCart(cartData);
+    } catch (error) {
+      fetchUserData(ignore, setIsLoading);
+    }
+  }, [isAuth]);
 
   useEffect(() => {
-    if (cart?.orders && userData?.cart) handleCartUpdate(cart);
+    if (!isObjEmpty(cart)) {
+      console.log(cart, sessionStorage.getItem("cart"));
+      sessionStorage.setItem("cart", JSON.stringify(cart));
+    }
   }, [cart]);
 
-  useEffect(() => {
-    if (!userData || !userData.cart || !cart.orders || isLoading) return;
+  const updateCart = useMemo(
+    () =>
+      debounceAsync(async (id, qty) => {
+        const { data } = await api.put(`/cart/set/${id}`, { quantity: qty });
+        console.log(data);
+        return data.cart;
+      }, 2000),
+    []
+  );
 
-    if (!compareObjects(userData?.cart, cart?.orders))
-      setCart(new Cart(userData.cart));
-  }, [userData]);
-
-  // function incrementProduct(productId) {
-  //   cart.incrementProduct(productId);
-  //   setCart(cart);
-  // }
-  // function decrementProduct(productId) {
-  //   cart.decrementProduct(productId);
-  //   setCart(cart);
-  // }
   function clearCart() {
-    setCart(new Cart({}));
+    // setCart(new Cart({}));
   }
 
-  async function handleCartUpdate(updatedCart) {
-    // setCart(newCart);
-    await updateUserData(userId, { cart: updatedCart?.orders });
-    setUserData(await getUserData(userId)); // synchronising
-  }
+  async function handleCartUpdate(id, prev, updatedCart) {
+    try {
+      if (!cart) return;
+      const newCart = await updateCart(id, updatedCart[id]);
 
-  async function getUserData(id) {
-    const users = localStorage.getItem("usersData");
-    const userData = JSON.parse(users || "{}")[id];
-    return userData;
-  }
+      if (!newCart) return;
 
-  async function updateUserData(id, newData = {}) {
-    if (!id) return false;
-    const users = JSON.parse(localStorage.getItem("usersData") || "{}");
-    const oldUserData = users[id];
-    const newUserData = { ...oldUserData, ...newData };
-    users[id] = newUserData;
-    localStorage.setItem("usersData", JSON.stringify(users));
-    return true;
+      // newCart -- Server synced / updatedCart -- Client synced
+      if (!compareObjects(newCart, updatedCart)) {
+        setCart(newCart);
+      }
+    } catch (error) {
+      console.error(error);
+      setCart(prev);
+    }
   }
 
   return (
     <UserContext.Provider
       value={{
-        userData,
-        setUserData,
-        cart,
+        fetchUserData,
+        handleCartUpdate,
         setCart,
-        updateUserData,
+        cart,
         clearCart,
       }}
     >

@@ -1,0 +1,48 @@
+.modalWrapper {
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #00000057;
+  z-index: 10000;
+}
+.modalWrapper.active {
+  display: flex;
+}
+.modalContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  height: 60%;
+  margin: auto;
+  background-color: rgb(221, 221, 221);
+  padding: 20px;
+  border-radius: 20px;
+}
+.modalContainer .modalHeader {
+  margin-bottom: 15px;
+}
+.modalContainer .modalHeader h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgb(84, 84, 84);
+}
+.modalContainer .modalBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  /* height: 100%; */
+  position: relative;
+  flex: 1 1 auto;
+  /* margin-top: 15px; */
+}
+
+.modalContainer .modalBody input {
+  flex: 0 0 100%;
+  margin-top: 25px;
+}

@@ -13,6 +13,9 @@
   font-size: 1.4rem;
   width: 100%;
 }
+.profile .loader {
+  margin-top: 30vh;
+}
 .profile__logo {
   width: 200px;
   height: 200px;

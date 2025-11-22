@@ -7,13 +7,13 @@ import ProductContextProvider from "./context/ProductContextProvider";
 function App() {
   return (
     <div className="App">
-      <AuthContextProvider>
-        <UserContextProvider>
-          <ProductContextProvider>
-            <AppRouterProvider />
-          </ProductContextProvider>
-        </UserContextProvider>
-      </AuthContextProvider>
+        <AuthContextProvider>
+          <UserContextProvider>
+            <ProductContextProvider>
+              <AppRouterProvider />
+            </ProductContextProvider>
+          </UserContextProvider>
+        </AuthContextProvider>
     </div>
   );
 }
