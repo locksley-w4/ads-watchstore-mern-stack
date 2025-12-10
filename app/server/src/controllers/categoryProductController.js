@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
 
@@ -83,13 +83,12 @@ export async function handleGetProducts(req, res) {
             path: ["nameShort", "description"],
             fuzzy: {
               maxEdits: 2,
-              prefixLength: 0
+              prefixLength: 0,
             },
           },
         },
       });
     }
-    
 
     const match = {};
 
@@ -131,11 +130,19 @@ export async function handleGetProducts(req, res) {
 
 export async function handleGetProductById(req, res) {
   try {
-    const { id } = req.params;
-    console.log(req.params);
-    
-    if (!id) return res.status(409).json({message: "No id was provided in URL params."});
-    const result = await Product.findById(id);
+    let { id } = req.query;
+    let parsedIDArray = id ? [id] : req.query["id[]"];
+
+    if (!parsedIDArray)
+      return res
+        .status(409)
+        .json({ message: "No id was provided in URL params." });
+
+    parsedIDArray = parsedIDArray.map((id) => new mongoose.Types.ObjectId(id));
+
+    const result = await Product.find({
+      _id: { $in: parsedIDArray },
+    });
     res.status(200).json(result);
   } catch (err) {
     console.error(err);

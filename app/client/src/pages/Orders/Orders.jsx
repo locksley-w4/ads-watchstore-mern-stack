@@ -1,19 +1,58 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import "./Orders.css";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import { UserContext } from "../../context/UserContextProvider";
 import OrderList from "../../components/Product/OrderList/OrderList";
 import { ProductsContext } from "../../context/ProductContextProvider";
+import { calculateCartTotal, fetchProductByID } from "../../utils/utils";
+import { HashLoader } from "react-spinners";
 
 const Orders = () => {
-  const { productPrices = {} } = useContext(ProductsContext);
-  const { clearCart } = useContext(UserContext);
+  // const { productPrices = {} } = useContext(ProductsContext);
+  const { cart, clearCart, fetchCart } = useContext(UserContext);
+  const [productsLoading, setProductsLoading] = useState(false);
   const [discount, setDiscount] = useState(0.25);
+  const [cartProducts, setCartProducts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  // useEffect(() => {
-  //   if (cart?.orders && cart?.orders)
-  //     setTotalPrice(cart.calculateTotal(cart.orders, productPrices));
-  // }, [cart.orders, productPrices]);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const fetchCartProducts = useCallback(async () => {
+    setErrorMsg(null);
+    const ids = Object.keys(cart);
+    if (!ids.length) {
+      return;
+    }
+    const [isError, data] = await fetchProductByID(ids, setProductsLoading);
+    console.log(data);
+
+    if (!isError && data) {
+      setCartProducts(data);
+    } else {
+      setErrorMsg("Failed to load cart from the server.");
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  useEffect(() => {
+    if (cart) fetchCartProducts();
+  }, [cart]);
+
+  useEffect(() => {
+    if (cartProducts?.length) setTotalPrice(calculateCartTotal(cartProducts, cart));    
+  }, [cartProducts]);
+
+  if (productsLoading) {
+    return <HashLoader color="#d1a851" style={{ marginTop: "30vh" }} />;
+  }
 
   return (
     <div className="orders-page">
@@ -23,8 +62,8 @@ const Orders = () => {
           <i className="fa fa-close" />
         </button>
       </PageHeader>
-
-      <OrderList />
+      {errorMsg && <p>{errorMsg}</p>}
+      <OrderList cartProducts={cartProducts} />
 
       <div className="prices">
         <div className="prices__row">

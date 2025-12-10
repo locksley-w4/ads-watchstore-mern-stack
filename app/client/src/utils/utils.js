@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { api, baseURL } from "../api/api";
 
 export async function fetchFiltered(filter, setLoading) {
@@ -20,7 +20,7 @@ export async function fetchFiltered(filter, setLoading) {
 export async function fetchProductByID(id, setLoading) {
   try {
     if (setLoading) setLoading(true);
-    const { data } = await api.get(`/product/${id}`);
+    const { data } = await api.get(`/product`, { params: { id } });
     if (setLoading) setLoading(false);
     return [false, data];
   } catch (error) {
@@ -29,6 +29,7 @@ export async function fetchProductByID(id, setLoading) {
     return [true, null];
   }
 }
+// fetchProductByID([1,2,4,5])
 
 // export async function getProductsByCategory(category, setLoading) {
 //   return await fetchFiltered({ category }, setLoading);
@@ -92,16 +93,21 @@ export function useSimilarProducts(keywords = []) {
   const [similar, setSimilar] = useState(null);
   const [isError, setIsError] = useState(false);
 
-  async function fetchSimilar() {
+  const fetchSimilar = useCallback(async () => {
     setIsError(false);
+    if (!keywords.length) return;
     const [_isError, products] = await fetchFiltered({ categories: keywords });
     if (_isError) setIsError(true);
     if (products?.length > 0) setSimilar(products);
-  }
-
-  useEffect(() => {
-    fetchSimilar();
   }, [keywords]);
+
+  useEffect(
+    () => {
+      if (keywords) fetchSimilar();
+    },
+    [keywords],
+    fetchSimilar
+  );
   return [isError, similar];
 }
 
@@ -168,24 +174,38 @@ export function debounceAsync(clb, timeout) {
 
   return (...args) => {
     clearTimeout(timerID);
-    
+
     // Reject previous promise if it exists
     if (latestResolve) {
       latestResolve(undefined);
     }
-    
+
     return new Promise((resolve) => {
       latestResolve = resolve;
       timerID = setTimeout(async () => {
         const value = await clb(...args);
         resolve(value);
-        console.log(123);
         latestResolve = null;
       }, timeout);
     });
   };
 }
 
-export function isObjEmpty (obj) {
-  return Object.keys({}).length <= 0
+export function isObjEmpty(obj) {
+  return Object.keys({}).length <= 0;
+}
+
+// Accepts an array of product IDs and returns an object with ID -> productData mapping
+export async function getProductsData(arr) {
+  const promises = arr.map((id) => api);
+}
+
+export function calculateCartTotal(products, cart) {
+  let total = 0;
+  for (const product of products) {
+    const quantity = cart[product._id];
+    if (!quantity) continue;
+    total += product.price * cart[product._id];
+  }
+  return total
 }

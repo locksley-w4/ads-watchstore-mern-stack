@@ -9,15 +9,17 @@ const BuyCounter = ({
   stopPropagation = false,
   ...props
 }) => {
-  const buyCount = useRef(0);
   const { isAuth } = useContext(AuthContext);
   // const [buyCount, setBuyCount] = useState(0);
   const { cart, handleCartUpdate, setCart } = useContext(UserContext);
+  const buyCount = useRef(0);
 
   useEffect(() => {
     if (!cart) return;
     const productCounter = cart[productId] || 0;
     buyCount.current = productCounter;
+    console.log(cart);
+    
     // setBuyCount(productCounter);
   }, [cart]);
 

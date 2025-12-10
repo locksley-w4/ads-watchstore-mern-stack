@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import { filterCart } from "../utils/utils.js";
 
 export async function handleUserUpdate(req, res) {
   try {
@@ -124,19 +125,49 @@ export async function updateCartContent(req, res) {
         .status(409)
         .json({ message: "Quantity cannot be less than 0" });
     }
+    const updatedCart = user.cart;
+    updatedCart[productId] = quantity;
+    const filteredCart = filterCart(updatedCart);
+
     await user.updateOne(
-      { $set: { [`cart.${productId}`]: quantity } },
+      { $set: { cart: filteredCart } },
       { runValidators: true }
     );
-    
+
     const updatedUser = await User.findOne({ _id: id });
-    console.log(updatedUser.cart);
-    
+
     // user.cart[productId] = (user.cart[productId] ?? 0) + 1;
     // console.log(updatedUser);
     // user.markModified("cart");
     // await user.save();
     res.status(200).json({ cart: updatedUser.cart });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function deleteCartContent(req, res) {
+  try {
+    const { id } = req.user;
+    if (!id) {
+      return res.status(401).json({ message: "Please sign in and try again" });
+    }
+
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User data not found. Try again later" });
+    }
+
+    await user.updateOne({ cart: {} });
+
+    // user.cart[productId] = (user.cart[productId] ?? 0) + 1;
+    // console.log(updatedUser);
+    // user.markModified("cart");
+    // await user.save();
+    res.status(200).json({ message: "Succesfully updated" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
@@ -214,7 +245,7 @@ export async function getCart(req, res) {
         .json({ message: "User data not found. Try again later" });
     }
 
-    res.status(200).json({ data: user.cart });
+    res.status(200).json({ cart: user.cart });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });

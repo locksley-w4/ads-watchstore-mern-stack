@@ -2,23 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../context/UserContextProvider";
 import BuyCounter from "../../ui/BuyCounter/BuyCounter";
 import { useNavigate } from "react-router-dom";
+import { normalizeImageURL } from "../../../utils/utils";
 
-const OrderList = () => {
-  const { cart } = useContext(UserContext);
-  const [productIDs, setProductsIDs] = useState([]);
-  // const products = useProducts(productIDs);
+const OrderList = ({cartProducts, ...props}) => {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (cart) setProductsIDs(Object.keys(cart.orders || {}));
-  }, [cart]);
 
   return (
     <ul className="orders-list">
-      {/* {productIDs.length ? (
-        productIDs.map((id, index) => {
-          if (!cart.orders[id]) return null;
-          const product = products[id];
+      {cartProducts && cartProducts.length ? (
+        cartProducts.map((product, index) => {
+          const id = product._id;
           if (!product)
             return (
               <li key={id}>
@@ -28,14 +21,13 @@ const OrderList = () => {
           return (
             <li className="order-card" key={id} onClick={() => {navigate(`/product/${id}`)}}>
               <div className="logo">
-                <img src={product?.imageUrl} alt="Product Image" />
+                <img src={normalizeImageURL(product?.imageUrl ?? "#")} alt="Product Image" />
               </div>
-              <h2 className="name">{product?.shortName}</h2>
+              <h2 className="name">{product?.nameShort}</h2>
               <p className="description">{product?.description}</p>
               <h3 className="price">$ {product?.price}</h3>
               <BuyCounter
                 vertical={true}
-                buyCount={cart.orders[id]}
                 productId={id}
                 stopPropagation={true}
               />
@@ -49,8 +41,8 @@ const OrderList = () => {
             cart.
           </p>
         </li>
-      )} */}
-      Needs to be done later
+      )}
+      {/* Needs to be done later */}
     </ul>
   );
 };

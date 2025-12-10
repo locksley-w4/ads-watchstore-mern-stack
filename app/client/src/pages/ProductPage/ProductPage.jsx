@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useParams } from "react-router-dom";
 import { fetchProductByID, useProduct } from "../../utils/utils";
 import "./ProductPage.css";
@@ -18,10 +24,10 @@ const ProductPage = () => {
 
   const descriptionRef = useRef(null);
 
-  async function fetchProduct(ignore) {
+  const fetchProduct = useCallback(async (ignore) => {
     if (ignore) return;
     setErrorMsg("");
-    ignore = true;    
+    ignore = true;
     let [isError, result] = await fetchProductByID(
       productId,
       setProductLoading
@@ -30,11 +36,12 @@ const ProductPage = () => {
       setErrorMsg("Unable to load products. Try again later");
     }
     ignore = false;
-    setProduct(result);
-  }
+    setProduct(result[0]);
+  }, [productId]);
 
   useEffect(() => {
     let ignore = false;
+
     fetchProduct(ignore);
   }, [productId]);
 
@@ -55,7 +62,7 @@ const ProductPage = () => {
     return <div>No product to show..</div>;
   }
   if (productLoading) {
-    return <HashLoader  color="#d1a851" style={{marginTop: "30vh"}}/>;
+    return <HashLoader color="#d1a851" style={{ marginTop: "30vh" }} />;
   }
 
   return (
@@ -106,7 +113,7 @@ const ProductPage = () => {
         </button>
       </div>
 
-      <SimilarProducts keywords={product?.categories} productId={product?.id} />
+      <SimilarProducts keywords={product?.categories} />
     </div>
   );
 };

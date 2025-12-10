@@ -16,8 +16,29 @@ export const UserContext = createContext();
 const UserContextProvider = ({ children }) => {
   const { isAuth, user, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCartLoading, setIsCartLoading] = useState(false);
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState({});
+
+  
+
+  async function fetchCart(setLoading, setError) {
+    try {
+      setLoading?.(true);
+      const { data } = await api.get("/cart");
+      setLoading?.(false);
+      if (data.cart) {
+        setCart(data.cart);
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      if (setError) {
+        setError({
+          message:
+            error?.response?.data?.message || "Error while retriving cart",
+        });
+      }
+    }
+  }
 
   async function fetchUserData(ignore, setLoading, setError) {
     if (ignore) return;
@@ -30,6 +51,7 @@ const UserContextProvider = ({ children }) => {
         setUser(data.user);
         sessionStorage.setItem("user", JSON.stringify(data.user));
         sessionStorage.setItem("cart", JSON.stringify(data.user.cart));
+        console.log(data.user);
       }
     } catch (error) {
       console.error(error);
@@ -52,10 +74,9 @@ const UserContextProvider = ({ children }) => {
     let ignore = false;
     try {
       const userData = JSON.parse(sessionStorage.getItem("user"));
-      const cartData = JSON.parse(sessionStorage.getItem("cart"));
+      let cartData = JSON.parse(sessionStorage.getItem("cart"));
       if (Object.keys(userData).length <= 0) throw new Error();
-      console.log(userData, cartData);
-
+      if (!cartData) cartData = userData.cart;
       setUser(userData);
       setCart(cartData);
     } catch (error) {
@@ -64,7 +85,7 @@ const UserContextProvider = ({ children }) => {
   }, [isAuth]);
 
   useEffect(() => {
-    if (!isObjEmpty(cart)) {
+    if (cart && !isObjEmpty(cart)) {
       console.log(cart, sessionStorage.getItem("cart"));
       sessionStorage.setItem("cart", JSON.stringify(cart));
     }
@@ -74,14 +95,26 @@ const UserContextProvider = ({ children }) => {
     () =>
       debounceAsync(async (id, qty) => {
         const { data } = await api.put(`/cart/set/${id}`, { quantity: qty });
-        console.log(data);
         return data.cart;
       }, 2000),
     []
   );
 
-  function clearCart() {
-    // setCart(new Cart({}));
+  async function clearCart() {
+    try {
+      const confirmed = window.confirm(
+        "Do you really want to empty your cart?"
+      );
+      if (!confirmed) return;
+      const response = await api.delete("/cart");
+      if (response.status.toString().startsWith("2")) {
+        sessionStorage.clear("cart");
+        setCart({});
+        alert("Cart has been cleared");
+      }
+    } catch (error) {
+      console.error(error?.message);
+    }
   }
 
   async function handleCartUpdate(id, prev, updatedCart) {
@@ -94,7 +127,9 @@ const UserContextProvider = ({ children }) => {
       // newCart -- Server synced / updatedCart -- Client synced
       if (!compareObjects(newCart, updatedCart)) {
         setCart(newCart);
+        return;
       }
+      sessionStorage.setItem("cart", JSON.stringify(newCart));
     } catch (error) {
       console.error(error);
       setCart(prev);
@@ -109,6 +144,7 @@ const UserContextProvider = ({ children }) => {
         setCart,
         cart,
         clearCart,
+        fetchCart
       }}
     >
       {children}

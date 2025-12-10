@@ -12,3 +12,11 @@ export async function getOfferBannerList() {
 //   const updated = await User.updateMany({}, { cart: {} });
 //   console.log(updated);
 // })();
+
+export const filterCart = (cart) => {
+  for (const key in cart) {
+    if (!Object.hasOwn(cart, key)) continue;
+    if (cart[key] <= 0) delete cart[key];
+  }
+  return cart;
+};

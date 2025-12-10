@@ -14,6 +14,7 @@ import {
 } from "../controllers/brandsBannersController.js";
 import authRouter from "./authRoutes.js";
 import {
+  deleteCartContent,
   getCart,
   handleChangePassword,
   handleGetUserData,
@@ -41,11 +42,13 @@ userRouter.get("/categories", handleGetCategories);
 // Products
 userRouter.get("/products", handleGetProducts);
 
+// userRouter.get("/products-ids", handleGetProducts);
+
 userRouter.post("/product", handleCreateProduct);
 
 userRouter.put("/product/:id", handleEditProduct);
 
-userRouter.get("/product/:id", handleGetProductById);
+userRouter.get("/product", handleGetProductById);
 
 // Offer banners
 userRouter.get("/offer-list", handleGetBanners);
@@ -57,6 +60,8 @@ userRouter.post("/brands", handleCreateBrands);
 
 // Cart
 userRouter.get("/cart", checkAuth, getCart);
+
+userRouter.delete("/cart", checkAuth, deleteCartContent);
 
 userRouter.put("/cart/set/:productId", checkAuth, updateCartContent);
 

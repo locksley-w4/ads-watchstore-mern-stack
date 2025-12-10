@@ -105,6 +105,8 @@
   max-height: 300px;
   overflow: hidden;
   position: relative;
+  /* width: 100%; */
+  flex: 0 0 100%;
 }
 .product-page .description::after {
   content: "";
@@ -143,5 +145,6 @@
 }
 
 .similar-products {
+  flex: 0 0 100%;
   margin: 0 auto;
 }
