@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose, { mongo, Mongoose } from "mongoose";
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
 
@@ -40,7 +40,26 @@ export async function handleCreateProduct(req, res) {
     //   });
     // }
     console.error(error);
-    res.sendStatus(500);
+    res.sendStatus(400);
+  }
+}
+
+export async function handleDeleteProduct(req, res) {
+  try {
+    const { descriptionTag } = req.query;
+    console.log(req.query);
+    
+    if (!descriptionTag) return res.sendStatus(400);
+    const response = await Product.deleteMany({ description: descriptionTag });
+    return res.status(200).send(response);
+  } catch (error) {
+    // if (error.code === 11000) {
+    //   return res.status(409).json({
+    //     message: `Product with given name already exists.`,
+    //   });
+    // }
+    console.error(error);
+    res.sendStatus(400);
   }
 }
 
@@ -67,12 +86,18 @@ export async function handleGetProducts(req, res) {
       search,
       categories,
       brand,
-      sortBy = "nameShort",
+      sortBy = "createdAt",
       sortOrder = "asc",
     } = req.query;
 
     const rawCategories = categories ?? req.query["categories[]"];
     const pipeline = [];
+
+    const page = Math.max(1, req.query.page || 1);
+    const limit = Math.min(100, req.query.limit || 10);
+    const skip = limit * (page - 1);
+    const estimatedTotal = await Product.estimatedDocumentCount();
+    let hasNextPage = false;
 
     if (search) {
       pipeline.push({
@@ -115,13 +140,26 @@ export async function handleGetProducts(req, res) {
       },
     });
 
-    pipeline.push({ $limit: 20 });
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit + 1 });
 
     // filter.nameShort = { $regex: new RegExp(`.*${filter.nameShort}.*`, "i") };
 
     const result = await Product.aggregate(pipeline);
+    if (result.length > limit) {
+      result.pop();
+      hasNextPage = true;
+    }
     // const filtered = await Product.find(filter ?? {});
-    res.status(200).json(result);
+    res.status(200).json({
+      data: result,
+      meta: {
+        estimatedTotal,
+        limit,
+        page,
+        hasNextPage,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.sendStatus(500);

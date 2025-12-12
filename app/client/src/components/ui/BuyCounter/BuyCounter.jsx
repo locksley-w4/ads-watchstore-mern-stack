@@ -17,9 +17,7 @@ const BuyCounter = ({
   useEffect(() => {
     if (!cart) return;
     const productCounter = cart[productId] || 0;
-    buyCount.current = productCounter;
-    console.log(cart);
-    
+    buyCount.current = productCounter;    
     // setBuyCount(productCounter);
   }, [cart]);
 

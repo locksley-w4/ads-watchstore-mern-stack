@@ -4,7 +4,7 @@ import { api } from "../api/api";
 export const ProductsContext = createContext(null);
 
 export default function ProductContextProvider({ children }) {
-  const [totalProducts, setTotalProducts] = useState([]);
+  // const [totalProducts, setTotalProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeProduct, setActiveProduct] = useState({}); // for setting active elem data for product page
 
@@ -33,16 +33,27 @@ export default function ProductContextProvider({ children }) {
       if (setLoading) setLoading(true);
       const { data } = await api.get("/products", { params: filter });
       if (setLoading) setLoading(false);
-      setTotalProducts(data);
+      // console.log(data);
+      
+      if (data.data) {
+        // setTotalProducts(data.data);
+        return [false, data.data, data.meta];
+      }
     } catch (err) {
       if (setLoading) setLoading(false);
       console.error(err);
+      return [true, null];
     }
   };
 
   return (
     <ProductsContext.Provider
-      value={{ fetchProducts, totalProducts, categories, activeProduct, setActiveProduct }}
+      value={{
+        fetchProducts,
+        categories,
+        activeProduct,
+        setActiveProduct,
+      }}
     >
       {children}
     </ProductsContext.Provider>

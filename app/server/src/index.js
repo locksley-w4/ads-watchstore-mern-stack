@@ -8,6 +8,7 @@ import cors from "cors";
 import { logger } from "./middlewares/middlewares.js";
 import { sessionConfig } from "./configs/sessionConfig.js";
 import cookieParser from "cookie-parser";
+import { backfillProperty } from "./utils/utils.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
@@ -15,6 +16,7 @@ const PORT = process.env.PORT ?? 5000;
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Successfully connected to db"))
+  // .then(() => {backfillProperty()})
   .catch((err) => console.error(err));
 
 app.use(express.json());
@@ -27,10 +29,11 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(logger); // logs request number
 app.use(sessionConfig);
 
 app.use("/uploads", express.static("uploads"));
+
+app.use(logger); // logs request number
 
 app.use("/api/v1", userRouter);
 

@@ -2,6 +2,7 @@ import express from "express";
 import {
   handleCreateCategory,
   handleCreateProduct,
+  handleDeleteProduct,
   handleEditProduct,
   handleGetCategories,
   handleGetProductById,
@@ -45,6 +46,8 @@ userRouter.get("/products", handleGetProducts);
 // userRouter.get("/products-ids", handleGetProducts);
 
 userRouter.post("/product", handleCreateProduct);
+
+userRouter.delete("/product", handleDeleteProduct);
 
 userRouter.put("/product/:id", handleEditProduct);
 

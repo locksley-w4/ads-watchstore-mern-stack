@@ -9,7 +9,7 @@ export async function fetchFiltered(filter, setLoading) {
     });
 
     if (setLoading) setLoading(false);
-    return [false, data];
+    return [false, data.data || []];
   } catch (error) {
     if (setLoading) setLoading(false);
     console.error(error);
@@ -207,5 +207,31 @@ export function calculateCartTotal(products, cart) {
     if (!quantity) continue;
     total += product.price * cart[product._id];
   }
-  return total
+  return total;
 }
+
+async function fillupTestProducts(total = 1) {
+  const objects = [];
+  const obj = {
+    imageUrl: "/uploads/testphoto.jpg",
+    nameFull: "Test Watch",
+    price: "17",
+    description: "qp]w[epdls;fafdm,TEST_WILL_BE_DELETED",
+  };
+  for (let i = 0; i < total; i++) {
+    objects.push(obj);
+  }
+  const response = await api.post("/product", objects);
+  console.log(response.data);
+}
+
+async function deleteAllTestProducts() {
+  const response = await api.delete("/product", {
+    params: { descriptionTag: "qp]w[epdls;fafdm,TEST_WILL_BE_DELETED" },
+  });
+  //   descriptionTag: "qp]w[epdls;fafdm,TEST_WILL_BE_DELETED" ,
+  // });
+  console.log(response.data);
+}
+// deleteAllTestProducts();
+// fillupTestProducts(50);

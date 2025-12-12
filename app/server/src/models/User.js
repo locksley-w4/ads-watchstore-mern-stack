@@ -1,46 +1,49 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    unique: true,
-    index: true,
-    required: true,
-    maxLength: 70,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      unique: true,
+      index: true,
+      required: true,
+      maxLength: 70,
+    },
+    fullName: {
+      type: String,
+      //   required: true,
+      maxLength: 40,
+    },
+    cart: {
+      type: Object,
+      default: {},
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    orders: {
+      type: Array,
+      default: [],
+    },
+    cards: {
+      type: Array,
+      default: [],
+    },
+    password: {
+      type: String,
+      required: true,
+      maxLength: 200,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      maxLength: 30,
+    },
   },
-  fullName: {
-    type: String,
-    //   required: true,
-    maxLength: 40,
-  },
-  cart: {
-    type: Object,
-    default: {},
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
-  orders: {
-    type: Array,
-    default: [],
-  },
-  cards: {
-    type: Array,
-    default: [],
-  },
-  password: {
-    type: String,
-    required: true,
-    maxLength: 200,
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-    maxLength: 30,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) next();
@@ -62,7 +65,7 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.methods.comparePasswords = async function (providedPassword) {
-  if(!providedPassword) return;
+  if (!providedPassword) return;
   // console.log(providedPassword);
   const success = await bcrypt.compare(String(providedPassword), this.password);
   return success;

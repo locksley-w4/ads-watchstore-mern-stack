@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import User from "../models/User.js";
+import Product from "../models/Product.js";
 
 export async function getOfferBannerList() {
   const offersDir = path.resolve("./uploads/offer-banners");
@@ -20,3 +21,18 @@ export const filterCart = (cart) => {
   }
   return cart;
 };
+
+export async function backfillProperty() {
+  const response = await Product.updateMany(
+    {},
+    // { createdAt: { $exists: false } },
+    [{
+      $set: {
+        createdAt: {
+          $toDate: "$_id",
+        },
+      },
+    }]
+  );
+  console.log(response);
+}
