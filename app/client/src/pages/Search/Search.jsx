@@ -44,7 +44,7 @@ const Search = () => {
       {errorMsg ? <p>{errorMsg}</p> : ""}
       {productsLoading ? (
         <p>Loading..</p>
-      ) : filteredProducts.length ? (
+      ) : filteredProducts?.length ? (
         <ProductsContainer>
           {filteredProducts.map((elem, i) => (
             <Product product={elem} key={i} />

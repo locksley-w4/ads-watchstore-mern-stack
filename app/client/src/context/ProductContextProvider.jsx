@@ -37,12 +37,12 @@ export default function ProductContextProvider({ children }) {
       
       if (data.data) {
         // setTotalProducts(data.data);
-        return [false, data.data, data.meta];
+        return [null, data.data, data.meta];
       }
     } catch (err) {
       if (setLoading) setLoading(false);
       console.error(err);
-      return [true, null];
+      return [err, null];
     }
   };
 

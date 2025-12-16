@@ -17,6 +17,7 @@ const FeaturedProducts = React.memo(
     const [hasMore, setHasMore] = useState(true);
     const [isError, setIsError] = useState(false);
     const ignore = useRef(false);
+    const requestErrorTries = useRef(0);
 
     const fetchMore = async () => {
       const [error, data, meta] = await fetchProducts(
@@ -24,7 +25,12 @@ const FeaturedProducts = React.memo(
         setProductsLoading
       );
       ignore.current = false;
-      if (error) return setIsError(true);
+      if (error) {
+        requestErrorTries.current++;
+        console.log(error, requestErrorTries.current);
+        if (error.status === 429) requestErrorTries.current = 10;
+        return setIsError(true);
+      }
       setFeatured((prev) => [...prev, ...data]);
       setHasMore(meta?.hasNextPage || false);
     };
@@ -36,7 +42,8 @@ const FeaturedProducts = React.memo(
     }, [page]);
 
     useEffect(() => {
-      if (!feedEndRef.current || !hasMore) return;
+      if (!feedEndRef.current || !hasMore || requestErrorTries.current > 5)
+        return;
 
       const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !productsLoading) {
@@ -47,7 +54,7 @@ const FeaturedProducts = React.memo(
       observer.observe(feedEndRef.current);
 
       return () => observer.disconnect();
-    }, [productsLoading, hasMore]);
+    }, [productsLoading, hasMore, requestErrorTries]);
 
     return (
       <div className="homepage-featured">

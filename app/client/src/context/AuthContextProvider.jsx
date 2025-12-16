@@ -21,7 +21,7 @@ const AuthContextProvider = ({ children }) => {
     setAuthErrorMsg("");
   }
 
-  useEffect(() => {    
+  useEffect(() => {
     setIsAuth(!!sessionStorage.getItem("accessToken"));
     // const _id = localStorage.getItem("userId");
     // setId(_id !== "undefined" ? _id : null);
@@ -31,7 +31,7 @@ const AuthContextProvider = ({ children }) => {
     try {
       const response = await api.post("/auth/logout");
       setIsAuth(false);
-      sessionStorage.removeItem("accessToken");      
+      sessionStorage.removeItem("accessToken");
       sessionStorage.removeItem("user");
       // await api.post("/auth/logout");
     } catch (error) {
@@ -76,9 +76,20 @@ const AuthContextProvider = ({ children }) => {
       console.error(er);
       setIsAuthLoading(false);
       setIsAuthError(true);
-      if (er.response?.status === 401 ?? 500)
-        setAuthErrorMsg("Wrong credentials");
-      else setAuthErrorMsg(er.response?.data?.message ?? "Server error");
+      const { status } = er.response;
+      switch (status) {
+        case 401:
+          setAuthErrorMsg("Wrong credentials");
+          break;
+
+        case 429:
+          setAuthErrorMsg("Too many attempts");
+          break;
+
+        default:
+          setAuthErrorMsg(er.response?.data?.message ?? "Server error");
+          break;
+      }
     }
   }
   async function register({ email, password, fullName, phoneNumber }) {
@@ -115,8 +126,20 @@ const AuthContextProvider = ({ children }) => {
       console.error(er);
       setIsAuthLoading(false);
       setIsAuthError(true);
-      if (er.response?.status === 401) setAuthErrorMsg("Wrong credentials");
-      else setAuthErrorMsg(er.response?.data?.message ?? "Server error");
+      const { status } = er.response;
+      switch (status) {
+        case 401:
+          setAuthErrorMsg("Wrong credentials");
+          break;
+
+        case 429:
+          setAuthErrorMsg("Too many attempts");
+          break;
+
+        default:
+          setAuthErrorMsg(er.response?.data?.message ?? "Server error");
+          break;
+      }
     }
   }
 
