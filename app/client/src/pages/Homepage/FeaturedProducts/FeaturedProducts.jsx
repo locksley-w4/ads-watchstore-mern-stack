@@ -30,31 +30,21 @@ const FeaturedProducts = React.memo(
     };
 
     useEffect(() => {
-      // setFeatured(totalProducts);
-      console.log(featured);
-    }, [featured]);
-
-    useEffect(() => {
       if (productsLoading || ignore.current) return;
-      console.log(productsLoading, page, hasMore);
       ignore.current = true;
       fetchMore();
     }, [page]);
 
     useEffect(() => {
-      console.log("ue start");
       if (!feedEndRef.current || !hasMore) return;
 
       const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !productsLoading) {
           setPage((prev) => prev + 1);
-          console.log("ue int");
         }
       });
 
       observer.observe(feedEndRef.current);
-
-      console.log("ue end");
 
       return () => observer.disconnect();
     }, [productsLoading, hasMore]);
@@ -63,13 +53,13 @@ const FeaturedProducts = React.memo(
       <div className="homepage-featured">
         <SectionHeader>Featured Products</SectionHeader>
         <ProductsContainer>
-          {featured.length
-          ?
+          {featured.length ? (
             featured.map((product, index) => (
               <Product key={index} product={product} />
             ))
-          : (<p>No products to show.</p>)
-          }
+          ) : (
+            <p>No products to show.</p>
+          )}
         </ProductsContainer>
         <div ref={feedEndRef} className="feedEnd" />
         {isError && <p>Loading error</p>}

@@ -84,6 +84,7 @@ const ProductPage = () => {
         <h2 className="name">{product?.nameFull}</h2>
         <h3 className="price">$ {product?.price}</h3>
       </div>
+      
       <BuyCounter productId={productId} />
 
       <table className="details">

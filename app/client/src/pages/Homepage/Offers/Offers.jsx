@@ -9,10 +9,17 @@ import { normalizeImageURL } from "../../../utils/utils";
 
 const Offers = () => {
   const [banners, setBanners] = useState([]);
+  const [isError, setIsError] = useState(false);
 
   const fetchOffers = async () => {
-    const { data: bannerList } = await api.get("/offer-list");
-    setBanners(bannerList);
+    try {
+      setIsError(false);
+      const { data: bannerList } = await api.get("/offer-list");
+      setBanners(bannerList);
+    } catch (error) {
+      setIsError(true);
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -23,11 +30,15 @@ const Offers = () => {
     <div className="homepage-offers">
       <SectionHeader>Top Deals</SectionHeader>
       <SliderList>
+        {isError && (<p>No banners available right now.</p>)}
         {banners.length &&
           banners.map((banner, index) => (
             <li className="offer-elem" key={index}>
               <Link to="/">
-                <img src={normalizeImageURL(banner)} alt="Special offer banner" />
+                <img
+                  src={normalizeImageURL(banner)}
+                  alt="Special offer banner"
+                />
               </Link>
             </li>
           ))}

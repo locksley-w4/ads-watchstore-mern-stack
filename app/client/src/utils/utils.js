@@ -155,6 +155,8 @@ export function compareObjects(a, b) {
 }
 
 export function normalizeImageURL(url, needPrefix = false) {
+  const external = url.startsWith("https://");
+  if (external) return url;
   return `${baseURL}${url}`;
 }
 
