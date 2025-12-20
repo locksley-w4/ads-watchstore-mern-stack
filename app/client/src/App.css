@@ -1,0 +1,29 @@
+.App {
+  min-height: 100vh;
+  padding-bottom: 100px;
+  width: 100%;
+  overflow-x: hidden;
+}
+button.myBtn {
+  background: var(--primary-color);
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 20px;
+  font-size: 20px;
+  position: relative;
+  margin-top: auto;
+  /* margin-bottom: 20px; */
+  font-family: "Source Sans 3", serif;
+}
+button.myBtn.white {
+  background: var(--white);
+  color: rgb(98, 98, 98);
+  font-weight: 600;
+  border: 3px solid rgb(192, 192, 192);
+}
+p.errorMsg {
+  font-weight: 500;
+  font-size: 1.6rem;
+  color: red;
+}

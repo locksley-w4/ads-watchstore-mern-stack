@@ -1,3 +1,5 @@
 .terraform.*
 .terraform
 app/build
+.env*
+node_modules/
