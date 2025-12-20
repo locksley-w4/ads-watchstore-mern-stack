@@ -1,8 +1,8 @@
 import session from "express-session";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import connectMongoDB from "connect-mongodb-session";
 
-dotenv.config();
+// dotenv.config();
 
 const MongoDBStore = connectMongoDB(session);
 

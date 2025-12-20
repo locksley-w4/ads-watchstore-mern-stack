@@ -1,5 +1,6 @@
-import dotenv from "dotenv";
-dotenv.config();
+// console.log(process.env);
+// import dotenv from "dotenv";
+// dotenv.config();
 
 import express from "express";
 import mongoose from "mongoose";
@@ -13,6 +14,8 @@ import { globalLimiter } from "./middlewares/rateLimiters/rateLimiters.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
+
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -38,7 +41,8 @@ app.use(globalLimiter)
 
 app.use(logger); // logs request number
 
-app.use("/api/v1", userRouter);
+app.use("/v1", userRouter);
+// app.use("/api/v1", userRouter);
 
 app.listen(PORT, (err) => {
   if (err) return console.error(err);

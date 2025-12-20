@@ -1,9 +1,11 @@
 import axios from "axios";
 // import process from "process";
 
-const NODE_ENV = "development";
+const NODE_ENV = process.env.NODE_ENV;
+console.log(NODE_ENV);
 
-export const baseURL = NODE_ENV === "production" ? "" : "http://localhost:5000";
+// export const baseURL = NODE_ENV === "production" ? "" : "http://localhost:5000";
+export const baseURL = "";
 
 export const baseAPIURL = `${baseURL}/api/v1`;
 
