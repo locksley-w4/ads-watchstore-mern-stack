@@ -16,7 +16,7 @@ E-commerce platform for watches with advertising features.
 **Backend:** Node.js, Express 5, MongoDB, Mongoose  
 **Auth:** JWT, bcrypt, express-session  
 **DevOps:** Docker, Nginx, Terraform (GCP), Ansible
-Cloud integration may be fully implemented later. For now, let it reside in this repo...
+# Cloud integration may be fully implemented later. For now, let it reside in this repo...
 
 ## Prerequisites
 
