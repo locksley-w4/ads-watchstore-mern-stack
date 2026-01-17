@@ -15,8 +15,6 @@ import { globalLimiter } from "./middlewares/rateLimiters/rateLimiters.js";
 const app = express();
 const PORT = process.env.PORT ?? 5000;
 
-
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Successfully connected to db"))
