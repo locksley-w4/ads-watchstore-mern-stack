@@ -1,7 +1,5 @@
 // console.log(process.env);
-// import dotenv from "dotenv";
-// dotenv.config();
-
+import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRoutes.js";
