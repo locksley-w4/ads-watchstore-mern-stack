@@ -3,8 +3,8 @@ stages:
   - deploy
 
 variables:
-  CLIENT_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp-client
-  API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp-api
+  CLIENT_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/api
+  API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/client
   IMAGE_TAG: latest
   API_CONTAINER_NAME: api
   # DEPLOY_NAMESPACE: default
@@ -22,8 +22,6 @@ build_image:
     - docker build -t $CLIENT_IMAGE_NAME ./app/client
     - docker tag $API_IMAGE_NAME $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
     - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker push $API_IMAGE_NAME
-    - docker push $CLIENT_IMAGE_NAME
     - docker push $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
     - docker push $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
     - docker rmi $API_IMAGE_NAME
