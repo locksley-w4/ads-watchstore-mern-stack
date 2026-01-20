@@ -1,19 +1,31 @@
-name: Mirror to GitLab
+name: Push to GitLab (Safe Mirror)
 
 on:
   push:
     branches:
       - "**"
+    tags:
+      - "**"
 
 jobs:
   mirror:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout full history
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Push to GitLab
+      - name: Add GitLab remote
         run: |
+          git remote remove gitlab || true
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_WRITE_ACCESS }}@gitlab.com/locksley-w4/watchstore-webapp.git
-          git push --mirror gitlab
+
+      - name: Push branches
+        run: |
+          git push gitlab --all --force
+
+      - name: Push tags
+        run: |
+          git push gitlab --tags --force
