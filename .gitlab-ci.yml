@@ -3,11 +3,12 @@ stages:
   - deploy
 
 variables:
-  IMAGE_NAME: $CI_REGISTRY/locksley-w4/ads_watchstore
+  CLIENT_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp-client
+  API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp-api
   IMAGE_TAG: latest
-  CONTAINER_NAME: web
-  DEPLOY_NAMESPACE: default
-  DEPLOY_NAME: web
+  API_CONTAINER_NAME: api
+  # DEPLOY_NAMESPACE: default
+  # DEPLOY_NAME: api
 
 build_image:
   stage: build
@@ -17,16 +18,23 @@ build_image:
 
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $IMAGE_NAME ./app
-    - docker tag $IMAGE_NAME $IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker push $IMAGE_NAME
-    - docker push $IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker rmi $IMAGE_NAME
-    - docker rmi $IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker build -t $API_IMAGE_NAME ./app/server
+    - docker build -t $CLIENT_IMAGE_NAME ./app/client
+    - docker tag $API_IMAGE_NAME $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker push $API_IMAGE_NAME
+    - docker push $CLIENT_IMAGE_NAME
+    - docker push $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker push $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker rmi $API_IMAGE_NAME
+    - docker rmi $CLIENT_IMAGE_NAME
+    - docker rmi $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker rmi $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
 
   # when: manual
   only:
     - main
+    - aws-deploy
 
 deploy_image:
   stage: deploy
@@ -34,5 +42,6 @@ deploy_image:
   script:
     - kubectl set image -n $DEPLOY_NAMESPACE deploy/$DEPLOY_NAME $CONTAINER_NAME=$IMAGE_NAME:$IMAGE_TAG
 
+  when: manual
   only:
     - main
