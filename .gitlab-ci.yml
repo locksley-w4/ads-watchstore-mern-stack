@@ -63,7 +63,7 @@ deploy:
     - chmod 700 ~/.ssh
     - cp "$EC2_SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
     - ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
     - chmod 644 ~/.ssh/known_hosts
 
   script:
@@ -74,7 +74,7 @@ deploy:
     - scp app/docker-compose.yml $SSH_TARGET:$APP_DIR/docker-compose.yml
     - ssh $SSH_TARGET "
         cd $APP_DIR &&
-        echo "$AWS_IMAGE_BUCKET" >> .env &&
+        echo "$AWS_IMAGE_BUCKET" > .env &&
         echo "$JWT_ACCESS_SECRET" >> .env &&
         echo "$JWT_REFRESH_SECRET" >> .env &&
         echo "$SESSION_SECRET" >> .env &&
