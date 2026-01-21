@@ -13,7 +13,7 @@ variables:
 
 build_api:
   stage: build
-  image: docker:24
+  image: docker
   services:
     - docker:dind
 
@@ -32,7 +32,7 @@ build_api:
 
 build_client:
   stage: build
-  image: docker:24
+  image: docker
   services:
     - docker:dind
 
