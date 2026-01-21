@@ -87,3 +87,5 @@ deploy:
   only:
     - main
     - aws-deploy
+  
+  when: always
