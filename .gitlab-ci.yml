@@ -61,9 +61,9 @@ deploy:
     - apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - cp "$EC2_SSH_PRIVATE_KEY" ~/.ssh/id_rsa
+    - cp "$EC2_SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
     - ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh/id_ed25519
     - chmod 644 ~/.ssh/known_hosts
 
   script:
