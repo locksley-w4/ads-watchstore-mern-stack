@@ -7,39 +7,78 @@ variables:
   API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/client
   IMAGE_TAG: latest
   API_CONTAINER_NAME: api
+  APP_NAME: watchstore-webapp
   # DEPLOY_NAMESPACE: default
   # DEPLOY_NAME: api
 
-build_image:
+build_api:
   stage: build
-  image: docker
+  image: docker:24
   services:
     - docker:dind
 
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - docker build -t $API_IMAGE_NAME ./app/server
-    - docker build -t $CLIENT_IMAGE_NAME ./app/client
-    - docker tag $API_IMAGE_NAME $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker push $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker push $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker tag $API_IMAGE_NAME $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker rmi $API_IMAGE_NAME
-    - docker rmi $CLIENT_IMAGE_NAME
-    - docker rmi $API_IMAGE_NAME:CI_COMMIT_SHORT_SHA
-    - docker rmi $CLIENT_IMAGE_NAME:CI_COMMIT_SHORT_SHA
+    - docker rmi $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 
   # when: manual
   only:
     - main
     - aws-deploy
 
-deploy_image:
-  stage: deploy
-  image: bitnami/kubectl
-  script:
-    - kubectl set image -n $DEPLOY_NAMESPACE deploy/$DEPLOY_NAME $CONTAINER_NAME=$IMAGE_NAME:$IMAGE_TAG
+build_client:
+  stage: build
+  image: docker:24
+  services:
+    - docker:dind
 
-  when: manual
+  script:
+    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - docker build -t $CLIENT_IMAGE_NAME ./app/client
+    - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker rmi $CLIENT_IMAGE_NAME
+    - docker rmi $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+
+  # when: manual
   only:
     - main
+    - aws-deploy
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - cp "$EC2_SSH_PRIVATE_KEY" ~/.ssh/id_rsa
+    - ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+  script:
+    - SSH_TARGET="$EC2_USER@$EC2_PUBLIC_IP"
+    - APP_DIR="/home/$EC2_USER/$APP_NAME"
+
+    - ssh $SSH_TARGET "mkdir -p $APP_DIR"
+    - scp app/docker-compose.yml $SSH_TARGET:$APP_DIR/docker-compose.yml
+    - ssh $SSH_TARGET "
+        cd $APP_DIR &&
+        echo "$AWS_IMAGE_BUCKET" >> .env &&
+        echo "$JWT_ACCESS_SECRET" >> .env &&
+        echo "$JWT_REFRESH_SECRET" >> .env &&
+        echo "$SESSION_SECRET" >> .env &&
+        echo "$MONGO_URI" >> .env &&
+        echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY &&
+        docker compose pull &&
+        docker compose up -d --remove-orphans &&
+        docker image prune -f
+      "
+  
+  only:
+    - main
+    - aws-deploy

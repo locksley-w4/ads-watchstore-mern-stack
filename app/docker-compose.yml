@@ -1,17 +1,11 @@
 services:
-  client-builder:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+  client:
+    image: registry.gitlab.com/locksley-w4/watchstore-webapp/client
     environment:
       - NODE_ENV=production
-    volumes:
-      - client-build:/app/build
 
   api:
-    build: ./server
-    env_file:
-      - ./server/.env
+    image: gistry.gitlab.com/locksley-w4/watchstore-webapp/api
     expose:
       - 5000
     restart: always
