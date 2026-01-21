@@ -20,7 +20,9 @@ build_api:
   script:
     - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - docker build -t $API_IMAGE_NAME ./app/server
+    - docker tag $API_IMAGE_NAME $API_IMAGE_NAME
     - docker tag $API_IMAGE_NAME $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $API_IMAGE_NAME
     - docker push $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker rmi $API_IMAGE_NAME
     - docker rmi $API_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
@@ -39,7 +41,9 @@ build_client:
   script:
     - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - docker build -t $CLIENT_IMAGE_NAME ./app/client
+    - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME
     - docker tag $CLIENT_IMAGE_NAME $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $CLIENT_IMAGE_NAME
     - docker push $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker rmi $CLIENT_IMAGE_NAME
     - docker rmi $CLIENT_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
@@ -56,7 +60,7 @@ deploy:
   before_script:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - cp "$EC2_SSH_PRIVATE_KEY" ~/.ssh/id_rsa
+    - cp $EC2_SSH_PRIVATE_KEY ~/.ssh/id_rsa
     - ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
 
