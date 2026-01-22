@@ -2,8 +2,6 @@ import session from "express-session";
 // import dotenv from "dotenv";
 import connectMongoDB from "connect-mongodb-session";
 
-// dotenv.config();
-
 const MongoDBStore = connectMongoDB(session);
 
 const SESSION_SECRET = process.env.SESSION_SECRET;

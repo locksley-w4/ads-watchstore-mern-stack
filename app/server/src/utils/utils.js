@@ -2,16 +2,17 @@ import fs from "fs/promises";
 import path from "path";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
-import { S3FetchOffersCommand } from "../configs/aws-s3.js";
+import { s3, S3FetchOffersCommand } from "../configs/aws-s3.js";
 
 export async function getOfferBannerList() {
   // const offersDir = path.resolve("./uploads/offer-banners");
   // const offerList = await fs.readdir(offersDir);
   const response = await s3.send(S3FetchOffersCommand);
-  const fileNames = response.Contents.map(obj => obj.Key);
-  return fileNames.map((elem) => "/uploads/" + elem);
+  const fileURLs = response.Contents.map(obj => `/uploads/${obj.Key}`);
+  return fileURLs;
 
 }
+getOfferBannerList()
 
 // (async function () {
 //   const updated = await User.updateMany({}, { cart: {} });
