@@ -192,7 +192,8 @@ export async function handleGetProducts(req, res) {
 export async function handleGetProductById(req, res) {
   try {
     let { id } = req.query;
-    let parsedIDArray = id ? [id] : req.query["id[]"];
+    const rawIDArray = id ?? req.query["id[]"];
+    let parsedIDArray = Array.isArray(rawIDArray) ? rawIDArray : [rawIDArray];
 
     if (!parsedIDArray)
       return res

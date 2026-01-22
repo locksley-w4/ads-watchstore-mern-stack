@@ -8,6 +8,9 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 export async function handleLogin(req, res) {
   try {
+    if (!req.body) {
+      return res.status(401).json({ message: "No userdata was provided." });
+    }
     const { login, password } = req.body;
     const user = await User.findOne({
       //   $or: [{ username: login }, { email: login }],

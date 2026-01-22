@@ -29,7 +29,6 @@ const Orders = () => {
       return;
     }
     const [isError, data] = await fetchProductByID(ids, setProductsLoading);
-    console.log(data);
 
     if (!isError && data) {
       setCartProducts(data);
