@@ -74,12 +74,12 @@ deploy:
     - scp app/docker-compose.yml $SSH_TARGET:$APP_DIR/docker-compose.yml
     - ssh $SSH_TARGET "
         cd $APP_DIR &&
-        echo "AWS_IMAGE_BUCKET=$AWS_IMAGE_BUCKET" > .env &&
-        echo "JWT_ACCESS_SECRET=$JWT_ACCESS_SECRET" >> .env &&
-        echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET" >> .env &&
-        echo "SESSION_SECRET=$SESSION_SECRET" >> .env &&
-        echo "MONGO_URI=$MONGO_URI" >> .env &&
-        echo $CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY &&
+        echo AWS_IMAGE_BUCKET="$AWS_IMAGE_BUCKET" > .env &&
+        echo JWT_ACCESS_SECRET="$JWT_ACCESS_SECRET" >> .env &&
+        echo JWT_REFRESH_SECRET="$JWT_REFRESH_SECRET" >> .env &&
+        echo SESSION_SECRET="$SESSION_SECRET" >> .env &&
+        echo MONGO_URI="$MONGO_URI" >> .env &&
+        echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY &&
         docker compose pull &&
         docker compose up -d --remove-orphans &&
         docker image prune -f
