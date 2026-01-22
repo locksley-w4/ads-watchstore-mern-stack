@@ -8,6 +8,8 @@ services:
 
   api:
     image: registry.gitlab.com/locksley-w4/watchstore-webapp/api:latest
+    env_file:
+      - .env
     expose:
       - 5000
     restart: always

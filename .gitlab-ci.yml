@@ -3,8 +3,8 @@ stages:
   - deploy
 
 variables:
-  CLIENT_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/api
-  API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/client
+  CLIENT_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/client
+  API_IMAGE_NAME: $CI_REGISTRY/locksley-w4/watchstore-webapp/api
   IMAGE_TAG: latest
   API_CONTAINER_NAME: api
   APP_NAME: watchstore-webapp
