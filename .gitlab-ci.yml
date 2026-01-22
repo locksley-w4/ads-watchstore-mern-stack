@@ -62,6 +62,7 @@ deploy:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - cat "$EC2_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+    - head ~/.ssh/id_ed25519 -n 2
     - ssh-keyscan $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
     - chmod 600 ~/.ssh/id_ed25519
     - chmod 644 ~/.ssh/known_hosts
@@ -71,6 +72,7 @@ deploy:
     - APP_DIR="/home/$EC2_USER/$APP_NAME"
 
     - ssh $SSH_TARGET "mkdir -p $APP_DIR"
+    - echo $SSH_TARGET
     - scp app/docker-compose.yml $SSH_TARGET:$APP_DIR/docker-compose.yml
     - ssh $SSH_TARGET "
         cd $APP_DIR &&
