@@ -8,7 +8,6 @@ import Profile from "../pages/Profile/Profile";
 import Search from "../pages/Search/Search";
 import Orders from "../pages/Orders/Orders";
 import ProductPage from "../pages/ProductPage/ProductPage";
-import { path } from "animejs";
 import Filter from "../pages/Filter/Filter";
 import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup/Signup";
