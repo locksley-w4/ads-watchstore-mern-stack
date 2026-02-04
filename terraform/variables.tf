@@ -1,15 +1,13 @@
-variable "project_id" {
-    default = "asadbek-asrarkhanov"
-}
-
 variable "region" {
-    default = "us-central1"
+    type = string
+    default = "us-east-1"
 }
 
-variable "zone" {
-    default = "us-central1-a"
+variable "az_id" {
+    type = string
+    default = "use1-az2"
 }
 
-variable "public_key_path" {
-    default = "~./.ssh/id_rsa.pub"
-}
+# variable "public_key_path" {
+#     default = "~./.ssh/id_rsa.pub"
+# }
